@@ -39,6 +39,32 @@ class filter_opencastfilter extends moodle_text_filter {
 
 
     public function filter($text, array $options = array()) {
+    	//Checks momentarily only for videos embedded in <video> tag
+
+	    if (stripos($text, '</video>') === false) {
+		    // Performance shortcut - if there are no </video> tags, nothing can match.
+		    return $text;
+	    }
+
+	    // Looking for tags.
+	    $matches = preg_split('/(<[^>]*>)/i', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+	    if (!$matches) {
+		   foreach($matches as $match) {
+		   	    if(substr($match, 0, 6) === "<video") {
+		   	    	// Replace it
+		        }
+		   }
+
+		      return $text;
+	    }
+
+	    $newtext = $text;
+
+
+
+	    // Return the same string except processed by the above.
+	    return $newtext;
     }
 
 
