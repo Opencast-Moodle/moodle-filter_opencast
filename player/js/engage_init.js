@@ -4,7 +4,7 @@ requirejs.config({
     waitSeconds: 50,
     paths: {
         engage: "../engage",
-        plugins: "../plugin/*/static"
+        plugins: "../plugin"
     },
     shim: {
         "bootstrap": {
@@ -36,6 +36,6 @@ requirejs.config({
         }
     }
 });
-var PLUGIN_PATH = "../../plugin/";
+var PLUGIN_PATH = "../plugin/";
 // start core logic
 require(["engage/core"]);

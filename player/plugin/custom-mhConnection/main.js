@@ -94,15 +94,10 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
             break;
     }
 
-    /* change these variables */
-    var SEARCH_ENDPOINT = "/search/episode.json";
-
     /* don't change these variables */
-    var initCount = 5;
-    var InfoMeModel;
+    var initCount = 3;
     var MediaPackageModel;
     var ViewsModel;
-    var FootprintCollection;
     var mediaPackageID = "";
     var mediaPackage; // mediaPackage data
     var mediaInfo; // media info like video tracks and attachments
@@ -111,7 +106,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
 
     function initTranslate(language) {
         var path = Engage.getPluginPath("EngagePluginCustomMhConnection").replace(/(\.\.\/)/g, "");
-        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+        var jsonstr = path; // this solution is really bad, fix it...
 
         Engage.log("Controls: selecting language " + language);
         jsonstr += "language/" + language + ".json";
@@ -145,42 +140,14 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     }
 
     /**
-     * callSearchEndpoint
-     *
-     * @param callback
-     */
-    function callSearchEndpoint(callback) {
-        if (callback === "function") {
-            $.ajax({
-                url: SEARCH_ENDPOINT,
-                data: {
-                    id: mediaPackageID
-                },
-                cache: false
-            }).done(function(data) {
-                // split search results
-                if (data && data["search-results"] && data["search-results"].result) {
-                    mediaPackage = data["search-results"].result;
-                    extractMediaInfo();
-                } else {
-                    Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_endpointNotAvailable", "A requested search endpoint is currently not available."));
-                }
-                callback();
-            });
-        }
-    }
-
-    /**
      * Initialize the plugin
      */
     function initPlugin() {
         if (!initialized) {
             initialized = true;
             initTranslate(Engage.model.get("language"));
-            Engage.model.set("infoMe", new InfoMeModel());
             Engage.model.set("mediaPackage", new MediaPackageModel());
             Engage.model.set("views", new ViewsModel());
-            Engage.model.set("footprints", new FootprintCollection());
         }
     }
 
@@ -204,41 +171,19 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
 
     Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
         if (callback === "function") {
-            if (!mediaPackage && !mediaInfo) {
-                callSearchEndpoint(function() {
-                    callback(mediaInfo);
-                });
-            } else {
-                callback(mediaInfo);
-            }
+            callback(mediaInfo);
         }
     });
 
     Engage.on(plugin.events.getMediaPackage.getName(), function(callback) {
         if (callback === "function") {
-            if (!mediaPackage) {
-                callSearchEndpoint(function() {
-                    callback(mediaPackage);
-                });
-            } else {
-                callback(mediaPackage);
-            }
+            callback(mediaPackage);
         }
     });
 
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("MhConnection: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
-    // load infoMe model
-    require([relative_plugin_path + "models/infoMe"], function(model) {
-        Engage.log("MhConnection: InfoMeModel loaded");
-        InfoMeModel = model;
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
@@ -259,16 +204,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     require([relative_plugin_path + "models/views"], function(model) {
         Engage.log("MhConnection: ViewsModel loaded");
         ViewsModel = model;
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
-    // load footprint collection
-    require([relative_plugin_path + "collections/footprint"], function(collection) {
-        Engage.log("MhConnection: FootprintCollection loaded");
-        FootprintCollection = collection;
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();

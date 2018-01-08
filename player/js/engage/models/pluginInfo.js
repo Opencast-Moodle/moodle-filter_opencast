@@ -23,7 +23,7 @@
 define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
-    var PLUGIN_MANAGER_PATH = "/engage/theodul/manager/list.json";
+    var PLUGIN_MANAGER_PATH = "plugin/list.json";
 
     var PluginInfoModel = Backbone.Model.extend({
         // URL of the search enpoint

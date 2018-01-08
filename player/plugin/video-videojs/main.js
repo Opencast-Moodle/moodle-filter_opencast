@@ -183,9 +183,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var mastervideotype = '';
   var aspectRatio = null;
   var singleVideoPaddingTop = '56.25%';
-  var initCount = 7;
+  var initCount = 5;
   var videoDisplayReady = 0;
-  var infoMeChange = 'change:infoMe';
   var mediapackageError = false;
   var videoDisplayNamePrefix = 'videojs_videodisplay_';
   var id_video_wrapper = 'video_wrapper';
@@ -261,7 +260,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   function initTranslate(language, funcSuccess, funcError) {
     var path = Engage.getPluginPath('EngagePluginVideoVideoJS').replace(/(\.\.\/)/g, '');
     /* this solution is really bad, fix it... */
-    var jsonstr = window.location.origin + '/engage/theodul/' + path;
+    var jsonstr = path;
 
     Engage.log('Controls: selecting language ' + language);
     jsonstr += 'language/' + language + '.json';
@@ -632,11 +631,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function (number) {
       var videoDisplays = $('.' + videoDisplayClass);
-      if (Engage.model.get('meInfo').get('hide_video_context_menu')) {
-        videoDisplays.on('contextmenu', function (e) {
-          e.preventDefault();
-        });
-      }
       if (number > 1) {
         selector = '.videoFocused video';
         videoFocused = false;
@@ -2189,8 +2183,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     }
 
-    var allowedTags = Engage.model.get('meInfo').get('allowedtags');
-    var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
+    var allowedTags;
+    var allowedFormats;
     mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
 
     return {
@@ -2308,9 +2302,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var videoSources;
     var videoDisplays;
     var duration = 0;
-
-    mastervideotype = Engage.model.get('meInfo').get('mastervideotype').toLowerCase();
-    Engage.log('Video: Master video type is \'' + mastervideotype + '\'');
 
     mediaInfo.tracks = tracks;
     mediaInfo.attachments = attachments;
@@ -2467,12 +2458,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   // listen on a change/set of the mediaPackage model
   Engage.model
     .on(mediapackageChange, function () {
-      initCount -= 1;
-      if (initCount <= 0) {
-        initPlugin();
-      }
-    })
-    .on(infoMeChange, function () {
       initCount -= 1;
       if (initCount <= 0) {
         initPlugin();

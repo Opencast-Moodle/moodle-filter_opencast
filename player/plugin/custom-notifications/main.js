@@ -126,7 +126,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
-        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+        var jsonstr = path; // this solution is really bad, fix it...
 
         Engage.log("Controls: selecting language " + language);
         jsonstr += "language/" + language + ".json";

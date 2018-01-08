@@ -167,7 +167,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         selectedLanguage = getDefaultLanguage(language);
     }
     console.log("Controls: selecting language " + selectedLanguage);
-    jsonstr += "../../language/" + selectedLanguage + ".json";
+    jsonstr += "language/" + selectedLanguage + ".json";
     $.ajax({
       url: jsonstr,
       dataType: "json",
@@ -364,9 +364,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       }
     },
     log: function (data) {
-      if (this.model.get("isDebug") && window.console) {
         console.log(data);
-      }
+     /* if (this.model.get("isDebug") && window.console) {
+        console.log(data);
+      }*/
     },
     group: function (block) {
       if (this.model.get("isDebug") && window.console) {
@@ -388,18 +389,17 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           if ($.isArray(plugins)) {
             $.each(plugins, function (index, value) {
               if (value["name"] === pluginName) {
-                evaluated_plugin_path = "../../../plugin/" + value["static-path"] + "/";
+                evaluated_plugin_path = "../../plugin/" + value["static-path"] + "/";
               }
             });
           } else {
-            evaluated_plugin_path = "../../../plugin/" + plugins["static-path"] + "/";
+            evaluated_plugin_path = "../../plugin/" + plugins["static-path"] + "/";
           }
         }
       }
       return evaluated_plugin_path;
     },
     loadCoreUI: function () {
-      console.log("loadcoreui");
       // switch view template and css rules for current player mode
       // link tag for css file
       var cssLinkTag = $("<link>");
@@ -474,13 +474,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
               $.each(pluginInfos.get("pluginlist").plugins, function (index, value) {
                 var plugin_name = value["name"];
                 engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
-                loadPlugin("../../../plugin/" + value["static-path"] + "/", plugin_name);
+                loadPlugin("../../plugin/" + value["static-path"] + "/", plugin_name);
               });
             } else {
               var plugin_name = pluginInfos.get("pluginlist").plugins["name"];
               plugins_loaded[plugin_name] = false;
               engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
-              loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
+              loadPlugin("../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
             }
           }
         }
@@ -505,7 +505,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       this.model.desktop = false;
       this.model.embed = false;
       this.model.mobile = false;
-
+        // core init event
+        this.dispatcher.on(events.coreInit.getName(), function () {
+            engageCore.loadCoreUI();
+        });
       // load plugins done, hide loading and show content
       this.dispatcher.on(events.mediaPackageModelError.getName(), function (str) {
         mediapackageError = true;

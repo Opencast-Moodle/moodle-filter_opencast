@@ -1,0 +1,66 @@
+{
+  "pluginlist":{
+    "plugins":[
+      {
+        "name":"EngagePluginCustomUsertracking",
+        "id":"10",
+        "description":"Custom Plugin to process usertracking footprints",
+        "static-path":"custom-usertracking"
+      },
+      {
+        "name":"EngagePluginTabDescription",
+        "id":"9",
+        "description":"Simple implementation of a tab with the video description",
+        "static-path":"tab-description"
+      },
+      {
+        "name":"EngagePluginCustomNotifications",
+        "id":"8",
+        "description":"Handles Matterhorns Endpoints",
+        "static-path":"custom-notifications"
+      },
+      {
+        "name":"EngagePluginTabShortcuts",
+        "id":"7",
+        "description":"Engage Plugin EngagePluginTabShortcuts",
+        "static-path":"tab-shortcuts"
+      },
+      {
+        "name":"EngagePluginDescription",
+        "id":"6",
+        "description":"Simple engage description plugin",
+        "static-path":"description"
+      },
+      {
+        "name":"EngagePluginVideoVideoJS",
+        "id":"5",
+        "description":"Videodisplay plugin which uses videoJS",
+        "static-path":"video-videojs"
+      },
+      {
+        "name":"EngagePluginTabSlidetext",
+        "id":"4",
+        "description":"Simple implementation of a tab with the text of the slides",
+        "static-path":"tab-slidetext"
+      },
+      {
+        "name":"EngagePluginCustomMhConnection",
+        "id":"3",
+        "description":"Connection",
+        "static-path":"custom-mhConnection"
+      },
+      {
+        "name":"EngagePluginTimelineStatistics",
+        "id":"2",
+        "description":"Implementation timeline plugin to view usertracking stats",
+        "static-path":"timeline-statistics"
+      },
+      {
+        "name":"EngagePluginControls",
+        "id":"1",
+        "description":"Simple implementation of a control bar",
+        "static-path":"controls"
+      }]
+  }
+}
+
