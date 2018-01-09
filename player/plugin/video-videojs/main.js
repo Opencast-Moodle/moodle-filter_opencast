@@ -183,7 +183,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var mastervideotype = '';
   var aspectRatio = null;
   var singleVideoPaddingTop = '56.25%';
-  var initCount = 5;
+  var initCount = 6;
   var videoDisplayReady = 0;
   var mediapackageError = false;
   var videoDisplayNamePrefix = 'videojs_videodisplay_';
