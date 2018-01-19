@@ -20,7 +20,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "mousewheel", "engage/models/engage", "engage/event", "core/config"], function (require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, Mousewheel, EngageModel, EngageEvent, cfg) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "mousewheel", "engage/models/engage", "engage/event"], function (require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, Mousewheel, EngageModel, EngageEvent) {
   "use strict";
 
   var events = {
@@ -637,7 +637,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       }
     },
     getPluginPath: function (pluginName) {
-      var evaluated_plugin_path = cfg.wwwroot + "/filter/opencast/player/plugin/";
+      var evaluated_plugin_path = "";
       var pluginsInfos = engageCore.model.get("pluginsInfo");
       if (pluginsInfos) {
         var pluginList = pluginsInfos.get("pluginlist");
@@ -646,11 +646,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           if ($.isArray(plugins)) {
             $.each(plugins, function (index, value) {
               if (value["name"] === pluginName) {
-                evaluated_plugin_path += value["static-path"] + "/";
+                evaluated_plugin_path = "../../plugin/" + value["static-path"] + "/";
               }
             });
           } else {
-            evaluated_plugin_path += plugins["static-path"] + "/";
+            evaluated_plugin_path = "../../plugin/" + plugins["static-path"] + "/";
           }
         }
       }
@@ -687,22 +687,22 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       var view_logic_path = "";
       switch (engageCore.model.get("mode")) {
         case "embed":
-          cssAttr.href = cfg.wwwroot + "/filter/opencast/player/css/core_embed_style.css";
-          core_template = cfg.wwwroot + "/filter/opencast/player/templates/core_embed.html";
-          view_logic_path = cfg.wwwroot + "/filter/opencast/player/js/engage/views/embed.js";
+          cssAttr.href = "css/core_embed_style.css";
+          core_template = "templates/core_embed.html";
+          view_logic_path = "engage/views/embed";
           engageCore.model.embed = true;
           break;
         case "mobile":
-          cssAttr.href = cfg.wwwroot + "/filter/opencast/player/css/core_mobile_style.css";
-          core_template = cfg.wwwroot + "/filter/opencast/player/templates/core_mobile.html";
-          view_logic_path = cfg.wwwroot + "/filter/opencast/player/js/engage/views/mobile.js";
+          cssAttr.href = "css/core_mobile_style.css";
+          core_template = "templates/core_mobile.html";
+          view_logic_path = "engage/views/mobile";
           engageCore.model.mobile = true;
           break;
         case "desktop":
         default:
-          cssAttr.href = engageCore.controls_top ? cfg.wwwroot + "/filter/opencast/player/css/core_desktop_style_top.css" : cfg.wwwroot + "/filter/opencast/player/css/core_desktop_style_bottom.css";
-          core_template = engageCore.controls_top ? cfg.wwwroot + "/filter/opencast/player/templates/core_desktop_top.html" : cfg.wwwroot + "/filter/opencast/player/templates/core_desktop_bottom.html";
-          view_logic_path = cfg.wwwroot + "/filter/opencast/player/js/engage/views/desktop.js";
+          cssAttr.href = engageCore.controls_top ? "css/core_desktop_style_top.css" : "css/core_desktop_style_bottom.css";
+          core_template = engageCore.controls_top ? "templates/core_desktop_top.html" : "templates/core_desktop_bottom.html";
+          view_logic_path = "engage/views/desktop";
           engageCore.model.desktop = true;
           break;
       }

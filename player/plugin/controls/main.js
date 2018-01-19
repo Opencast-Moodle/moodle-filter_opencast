@@ -1542,7 +1542,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
     // load jquery-ui touch-punch lib in mobile mode
     if (isMobileMode) {
-      require([relative_plugin_path + 'lib/jquery.ui.touch-punch.min.js'], function () {
+      require([relative_plugin_path + 'lib/jquery.ui.touch-punch.min'], function () {
         Engage.log('Controls: Lib jQuery UI Touch Punch loaded');
         initCount -= 1;
         if (initCount <= 0) {
@@ -1554,14 +1554,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
   // load hammer.js lib for gestures on mobile (touch enabled) devices
   if (isMobileMode) {
-    require([relative_plugin_path + 'lib/hammer.min.js'], function () {
+    require([relative_plugin_path + 'lib/hammer.min'], function () {
       Engage.log('Controls: Lib hammer.js loaded');
       initCount -= 1;
       if (initCount <= 0) {
         initPlugin();
       }
 
-      require([relative_plugin_path + 'lib/jquery.hammer.js'], function () {
+      require([relative_plugin_path + 'lib/jquery.hammer'], function () {
         initCount -= 1;
         if (initCount <= 0) {
           initPlugin();
@@ -1571,7 +1571,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   }
 
   // load utils class
-  require([relative_plugin_path + "utils.js"], function(utils) {
+  require([relative_plugin_path + "utils"], function(utils) {
       Engage.log("Controls: Utils class loaded");
       Utils = new utils();
       initTranslate(Engage.model.get("language"), function() {

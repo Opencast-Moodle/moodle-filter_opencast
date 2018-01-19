@@ -20,7 +20,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['jquery', 'backbone', 'core/config'], function($, Backbone, cfg) {
+define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
     var prop_shortcut = "player.shortcut.",
@@ -47,7 +47,7 @@ define(['jquery', 'backbone', 'core/config'], function($, Backbone, cfg) {
      * Model with information about the current user and the current MH configuration
      */
     var MeInfoModel = Backbone.Model.extend({
-        urlRoot: cfg.wwwroot + "/filter/opencast/info/me.json",
+        urlRoot: "../info/me.json",
         initialize: function() {
             this.fetch({
                 success: function(me) {

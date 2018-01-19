@@ -75,7 +75,7 @@ class filter_opencast extends moodle_text_filter {
                     $episode = $service->call('episode', $params);
                     file_put_contents($CFG->dirroot . '\filter\opencast\info\episode.json', $episode);
 
-                    $player = filter_opencast_load_player();
+                    $player = '<iframe src="'.$CFG->wwwroot.'/filter/opencast/player/core.html" width="100%" height="400px"></iframe>';
 		            $text = preg_replace('/<video.*<\/video>/', $player, $text, 1);
                 }
             }

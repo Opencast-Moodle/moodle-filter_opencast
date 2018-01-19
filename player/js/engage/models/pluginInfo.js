@@ -20,10 +20,10 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['jquery', 'backbone', 'core/config'], function($, Backbone, cfg) {
+define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
-    var PLUGIN_MANAGER_PATH = cfg.wwwroot + "/filter/opencast/player/plugin/list.json";
+    var PLUGIN_MANAGER_PATH = "plugin/list.json";
 
     var PluginInfoModel = Backbone.Model.extend({
         // URL of the search enpoint
