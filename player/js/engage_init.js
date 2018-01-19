@@ -1,41 +1,45 @@
 /* global require.js config */
-requirejs.config({
-    baseUrl: "js/lib",
-    waitSeconds: 50,
-    paths: {
-        engage: "../engage",
-        plugins: "../plugin"
-    },
-    shim: {
-        "bootstrap": {
-            deps: ["jquery"],
-            exports: "Bootstrap"
+define(["core/config"], function(mdlcfg) {
+
+    window.requirejs.config({
+        baseUrl: mdlcfg.wwwroot + "/filter/opencast/player/js/lib",
+        waitSeconds: 50,
+        paths: {
+            engage: mdlcfg.wwwroot + "/filter/opencast/player/js/engage",
+            plugins: mdlcfg.wwwroot + "/filter/opencast/player/plugin"
         },
-        "backbone": {
-            deps: ["underscore", "jquery"],
-            exports: "Backbone"
-        },
-        "underscore": {
-            exports: "_"
-        },
-        "mousetrap": {
-            exports: "Mousetrap"
-        },
-        "moment": {
-            exports: "Moment"
-        },
-        "basil": {
-            exports: "Basil"
-        },
-        "bowser": {
-            exports: "Bowser"
-        },
-        "bootbox": {
-            deps: ["bootstrap"],
-            exports: "Bootbox"
+        shim: {
+            "bootstrap": {
+                deps: ["jquery"],
+                exports: "Bootstrap"
+            },
+            "backbone": {
+                deps: ["underscore", "jquery"],
+                exports: "Backbone"
+            },
+            "underscore": {
+                exports: "_"
+            },
+            "mousetrap": {
+                exports: "Mousetrap"
+            },
+            "moment": {
+                exports: "Moment"
+            },
+            "basil": {
+                exports: "Basil"
+            },
+            "bowser": {
+                exports: "Bowser"
+            },
+            "bootbox": {
+                deps: ["bootstrap"],
+                exports: "Bootbox"
+            }
         }
-    }
-});
-var PLUGIN_PATH = "../plugin/";
+    });
+
+    var PLUGIN_PATH = mdlcfg.wwwroot + "/filter/opencast/player/plugin/";
 // start core logic
-require(["engage/core"]);
+    require(["engage/core"]);
+});

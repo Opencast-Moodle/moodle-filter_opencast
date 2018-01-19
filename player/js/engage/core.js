@@ -20,7 +20,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "mousewheel", "engage/models/engage", "engage/event"], function (require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, Mousewheel, EngageModel, EngageEvent) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "mousewheel", "engage/models/engage", "engage/event", "core/config"], function (require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, Mousewheel, EngageModel, EngageEvent, cfg) {
   "use strict";
 
   var events = {
@@ -67,6 +67,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var zoom_wasd_step_size = 15;
 
   /* don't change these variables */
+  var MeInfoModel;
   var setCustomError = false; // just for displaying purposes!
   var pluginControlsInserted = false;
   var pluginVideoInserted = false;
@@ -101,7 +102,37 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var mediapackageError = false;
   var numberOfPlugins = 0;
   var translationData = null;
-
+  var loggedIn = false;
+  var username = "Anonymous";
+  var pip = true;
+  var pipPos = "left";
+  var askedForLogin = false;
+  var springSecurityLoginURL = "/j_spring_security_check";
+  var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
+  // shortcuts
+  var shortcut_playPause = "controls.playPause";
+  var shortcut_seekLeft = "controls.seekLeft";
+  var shortcut_seekRight = "controls.seekRight";
+  var shortcut_playbackrateIncrease = "playbackrate.increase";
+  var shortcut_playbackrateDecrease = "playbackrate.decrease";
+  var shortcut_muteToggle = "volume.muteToggle";
+  var shortcut_volDown = "volume.down";
+  var shortcut_volUp = "volume.up";
+  var shortcut_fullscreenEnable = "fullscreen.enable";
+  var shortcut_fullscreenCancel = "fullscreen.cancel";
+  var shortcut_jumpToBegin = "controls.jumpToBegin";
+  var shortcut_prevChapter = "controls.prevChapter";
+  var shortcut_nextChapter = "controls.nextChapter";
+  var shortcut_prevFocus = "layout.focusPrev";
+  var shortcut_nextFocus = "layout.focusNext";
+  var shortcut_movePiP = "layout.movePiP";
+  var shortcut_togglePiP = "layout.togglePiP";
+  var shortcut_moveLeft = "zoom.moveLeft";
+  var shortcut_moveRight = "zoom.moveRight";
+  var shortcut_moveUp = "zoom.moveUp";
+  var shortcut_moveDown = "zoom.moveDown";
+  var shortcut_zoomIn = "zoom.in";
+  var shortcut_zoomOut = "zoom.out";
 
   var basilOptions = {
     namespace: "mhStorage"
@@ -141,7 +172,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           case "es": return "es-ES";
           case "fr": return "fr-FR";
           case "gl": return "gl-ES";
-          case "he": return "he-IL";
           case "nl": return "nl-NL";
           case "fi": return "fi-FI";
           case "it": return "it-IT";
@@ -151,7 +181,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           case "pl": return "pl-PL";
           case "pt": return "pt-BR";
           case "ru": return "ru-RU";
-          case "sl": return "sl-SI";
           case "sv": return "sv-SE";
           case "tr": return "tr-TR";
           case "zh": return "zh-CN";
@@ -203,6 +232,96 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
   }
 
+  function login() {
+    if (!askedForLogin) {
+      askedForLogin = true;
+      var username = "User";
+      var password = "Password";
+
+      Bootbox.dialog({
+        title: translate("loginInformation", "Log in"),
+        message: '<form class="form-signin">' +
+        '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
+        '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
+        '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
+        '<label class="checkbox">' +
+        '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
+        '</label>' +
+        '</form>',
+        buttons: {
+          cancel: {
+            label: translate("cancel", "Cancel"),
+            className: "btn-default",
+            callback: function () {
+              askedForLogin = false;
+            }
+          },
+          login: {
+            label: translate("login", "Log in"),
+            className: "btn-success",
+            callback: function () {
+              var username = $("#username").val().trim();
+              var password = $("#password").val().trim();
+              if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+                $.ajax({
+                  type: "POST",
+                  url: springSecurityLoginURL,
+                  data: {
+                    "j_username": username,
+                    "j_password": password,
+                    "_spring_security_remember_me": $("#rememberMe").is(":checked")
+                  }
+                }).done(function (msg) {
+                  password = "";
+                  if (msg.indexOf(springLoggedInStrCheck) === -1) {
+                    engageCore.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
+                    $("#" + id_btn_login).hide();
+                    $("#" + id_btn_reloadPage).click(function (e) {
+                      e.preventDefault();
+                      location.reload();
+                    });
+                    $("#" + id_btn_reloadPage).show();
+                    location.reload();
+                  } else {
+                    engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
+                    setCustomError = true;
+                  }
+                  askedForLogin = false;
+                }).fail(function () {
+                  password = "";
+                  engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
+                  setCustomError = true;
+                  askedForLogin = false;
+                });
+              } else {
+                askedForLogin = false;
+              }
+            }
+          }
+        },
+        className: "usernamePassword-modal",
+        onEscape: function () {
+          askedForLogin = false;
+        },
+        closeButton: false
+      });
+    }
+  }
+
+  function getLoginStatus() {
+    if (engageCore.model.get("infoMe")) {
+      if (engageCore.model.get("infoMe").loggedIn) {
+        loggedIn = true;
+        username = engageCore.model.get("infoMe").username;
+      } else {
+        loggedIn = false;
+        username = "Anonymous";
+      }
+      return loggedIn ? 1 : 0;
+    }
+    return -1;
+  }
+
   // binds configured shortcuts (see MH org config) to corresponding events
   function bindShortcutsToEvents() {
 
@@ -220,7 +339,137 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return false;
       }
     });
-   }
+    // process hardcoded keys
+    $.each(MeInfoModel.get("shortcuts"), function (i, val) {
+      switch (val.name) {
+        case shortcut_seekLeft:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.seekLeft.getName());
+          });
+          break;
+        case shortcut_seekRight:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.seekRight.getName());
+          });
+          break;
+        case shortcut_playbackrateIncrease:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.playbackRateIncrease.getName());
+          });
+          break;
+        case shortcut_playbackrateDecrease:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.playbackRateDecrease.getName());
+          });
+          break;
+        case shortcut_nextChapter:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.nextChapter.getName());
+          });
+          break;
+        case shortcut_fullscreenEnable:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.fullscreenEnable.getName());
+          });
+          break;
+        case shortcut_fullscreenCancel:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.fullscreenCancel.getName());
+          });
+          break;
+        case shortcut_jumpToBegin:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.seek.getName(), 0);
+          });
+          break;
+        case shortcut_prevChapter:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.previousChapter.getName());
+          });
+          break;
+        case shortcut_playPause:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.playPause.getName());
+          });
+          break;
+        case shortcut_muteToggle:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.muteToggle.getName());
+          });
+          break;
+        case shortcut_volDown:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.volumeDown.getName());
+          });
+          break;
+        case shortcut_volUp:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.volumeUp.getName());
+          });
+          break;
+        case shortcut_nextFocus:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.focusVideo.getName(), "focus.next");
+          });
+          break;
+        case shortcut_prevFocus:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.focusVideo.getName(), "focus.prev");
+          });
+          break;
+        case shortcut_movePiP:
+          Mousetrap.bind(val.key, function () {
+            if (pip) {
+                if (pipPos === "left") {
+                  pipPos = "right";
+                } else {
+                  pipPos = "left";
+                }
+                engageCore.trigger(events.movePiP.getName(), pipPos);
+            }
+          });
+          break;
+        case shortcut_togglePiP:
+          Mousetrap.bind(val.key, function () {
+            pip = !pip;
+            engageCore.trigger(events.togglePiP.getName(), pip);
+          });
+          break;
+        case shortcut_moveLeft:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.moveHorizontal.getName(), zoom_wasd_step_size);
+          });
+          break;
+        case shortcut_moveRight:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.moveHorizontal.getName(), -zoom_wasd_step_size);
+          });
+          break;
+        case shortcut_moveUp:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.moveVertical.getName(), zoom_wasd_step_size);
+          });
+          break;
+        case shortcut_moveDown:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.moveVertical.getName(), -zoom_wasd_step_size);
+          });
+          break;
+        case shortcut_zoomIn:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.zoomIn.getName(), true);
+          });
+          break;
+        case shortcut_zoomOut:
+          Mousetrap.bind(val.key, function () {
+            engageCore.trigger(events.zoomOut.getName(), true);
+          });
+          break;
+        default:
+          break;
+      }
+    });
+  }
 
   function checkAllPluginsloaded() {
     var all_plugins_loaded = true;
@@ -349,6 +598,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var EngageCore = Backbone.View.extend({
     el: $("#" + id_engage_view),
     Event: EngageEvent,
+    // bind a key event as a string to given event
+    bindKeyToEvent: function (shortcuts, event) {
+      // only for EngageEvent objects
+      if (event instanceof EngageEvent) {
+        Mousetrap.bind(shortcut, function () {
+          engageCore.trigger(event);
+        });
+      }
+    },
     on: function (event, handler, context) {
       if (event instanceof EngageEvent) {
         this.dispatcher.on(event.getName(), handler, context);
@@ -364,10 +622,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       }
     },
     log: function (data) {
+      if (this.model.get("isDebug") && window.console) {
         console.log(data);
-     /* if (this.model.get("isDebug") && window.console) {
-        console.log(data);
-      }*/
+      }
     },
     group: function (block) {
       if (this.model.get("isDebug") && window.console) {
@@ -380,7 +637,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       }
     },
     getPluginPath: function (pluginName) {
-      var evaluated_plugin_path = "";
+      var evaluated_plugin_path = cfg.wwwroot + "/filter/opencast/player/plugin/";
       var pluginsInfos = engageCore.model.get("pluginsInfo");
       if (pluginsInfos) {
         var pluginList = pluginsInfos.get("pluginlist");
@@ -389,15 +646,29 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           if ($.isArray(plugins)) {
             $.each(plugins, function (index, value) {
               if (value["name"] === pluginName) {
-                evaluated_plugin_path = "../../plugin/" + value["static-path"] + "/";
+                evaluated_plugin_path += value["static-path"] + "/";
               }
             });
           } else {
-            evaluated_plugin_path = "../../plugin/" + plugins["static-path"] + "/";
+            evaluated_plugin_path += plugins["static-path"] + "/";
           }
         }
       }
       return evaluated_plugin_path;
+    },
+    loadInfoMeModel: function (func) {
+      require(["engage/models/meInfo"], function (me) {
+        MeInfoModel = new me();
+        // wait that me infos are loaded
+        var intv = window.setInterval(function () {
+          if (MeInfoModel.ready()) {
+            window.clearInterval(intv);
+            if (func && (typeof func === "function")) {
+              func();
+            }
+          }
+        }, 15);
+      });
     },
     loadCoreUI: function () {
       // switch view template and css rules for current player mode
@@ -407,7 +678,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         type: "text/css",
         rel: "stylesheet"
       };
-      engageCore.controls_top = false; // bottom else
+      engageCore.controls_top = MeInfoModel.getPositionControls() === "top"; // bottom else
       engageCore.log("Core: Position of the controls is " + (engageCore.controls_top ? "top" : "bottom"));
 
       // template obj
@@ -416,22 +687,22 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       var view_logic_path = "";
       switch (engageCore.model.get("mode")) {
         case "embed":
-          cssAttr.href = "css/core_embed_style.css";
-          core_template = "templates/core_embed.html";
-          view_logic_path = "engage/views/embed";
+          cssAttr.href = cfg.wwwroot + "/filter/opencast/player/css/core_embed_style.css";
+          core_template = cfg.wwwroot + "/filter/opencast/player/templates/core_embed.html";
+          view_logic_path = cfg.wwwroot + "/filter/opencast/player/js/engage/views/embed.js";
           engageCore.model.embed = true;
           break;
         case "mobile":
-          cssAttr.href = "css/core_mobile_style.css";
-          core_template = "templates/core_mobile.html";
-          view_logic_path = "engage/views/mobile";
+          cssAttr.href = cfg.wwwroot + "/filter/opencast/player/css/core_mobile_style.css";
+          core_template = cfg.wwwroot + "/filter/opencast/player/templates/core_mobile.html";
+          view_logic_path = cfg.wwwroot + "/filter/opencast/player/js/engage/views/mobile.js";
           engageCore.model.mobile = true;
           break;
         case "desktop":
         default:
-          cssAttr.href = engageCore.controls_top ? "css/core_desktop_style_top.css" : "css/core_desktop_style_bottom.css";
-          core_template = engageCore.controls_top ? "templates/core_desktop_top.html" : "templates/core_desktop_bottom.html";
-          view_logic_path = "engage/views/desktop";
+          cssAttr.href = engageCore.controls_top ? cfg.wwwroot + "/filter/opencast/player/css/core_desktop_style_top.css" : cfg.wwwroot + "/filter/opencast/player/css/core_desktop_style_bottom.css";
+          core_template = engageCore.controls_top ? cfg.wwwroot + "/filter/opencast/player/templates/core_desktop_top.html" : cfg.wwwroot + "/filter/opencast/player/templates/core_desktop_bottom.html";
+          view_logic_path = cfg.wwwroot + "/filter/opencast/player/js/engage/views/desktop.js";
           engageCore.model.desktop = true;
           break;
       }
@@ -505,10 +776,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       this.model.desktop = false;
       this.model.embed = false;
       this.model.mobile = false;
-        // core init event
-        this.dispatcher.on(events.coreInit.getName(), function () {
-            engageCore.loadCoreUI();
-        });
+      // core init event
+      this.dispatcher.on(events.coreInit.getName(), function () {
+        engageCore.loadInfoMeModel(engageCore.loadCoreUI);
+      });
       // load plugins done, hide loading and show content
       this.dispatcher.on(events.mediaPackageModelError.getName(), function (str) {
         mediapackageError = true;
@@ -517,9 +788,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         $("#" + id_btn_reloadPage).hide();
         $("#" + id_customError_str).html(str);
         setCustomError = true;
-        $("#" + id_btn_login).hide();
+        if (getLoginStatus() === 0) {
+          $("#" + id_btn_login).click(login);
+          $("#" + id_customError + ", #" + id_btn_login).show();
+        } else {
+          // TODO: Logged in as...
+          $("#" + id_btn_login).hide();
+        }
       });
-
       // load plugins done, hide loading and show content
       this.dispatcher.on(events.plugin_load_done.getName(), function () {
         if (engageCore.model.desktop) {
@@ -583,6 +859,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             }
           }, loadingDelay2);
         }, loadingDelay1);
+      });
+
+      this.dispatcher.on(events.movePiP.getName(), function (pos) {
+        pipPos = pos;
+      });
+      this.dispatcher.on(events.togglePiP.getName(), function (status) {
+        pip = status;
       });
     }
   });
