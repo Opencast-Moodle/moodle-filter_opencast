@@ -23,10 +23,19 @@
 define(["backbone", "engage/core"], function(Backbone, Engage) {
     "use strict";
 
-    var INFO_ME_ENDPOINT = "../info/me.json";
+    var INFO_ME_ENDPOINT = opencastlink+"/info/me.json";
 
     var InfoMeModel = Backbone.Model.extend({
         urlRoot: INFO_ME_ENDPOINT,
+        sync: function(method, model, options) {
+            options ||(options = {});
+
+            options.type = 'get';
+            options.crossDomain = true;
+            options.xhrFields = {withCredentials:true};
+
+            return Backbone.sync(method, model, options);
+        },
         initialize: function() {
             Engage.log("MhConnection: Init InfoMe model");
             this.update();

@@ -20,12 +20,6 @@
         "static-path":"custom-mhConnection"
       },
       {
-        "name":"EngagePluginTimelineStatistics",
-        "id":"2",
-        "description":"Implementation timeline plugin to view usertracking stats",
-        "static-path":"timeline-statistics"
-      },
-      {
         "name":"EngagePluginControls",
         "id":"1",
         "description":"Simple implementation of a control bar",

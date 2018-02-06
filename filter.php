@@ -26,7 +26,8 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/filter/opencast/lib.php');
+require_once($CFG->dirroot . '/filter/opencast/lib.php');
+require_once($CFG->libdir . '/oauthlib.php');
 
 /**
  * Automatic opencast videos filter class.
@@ -40,7 +41,7 @@ class filter_opencast extends moodle_text_filter {
 
 
     public function filter($text, array $options = array()) {
-        global $CFG;
+        global $CFG, $PAGE;
         //Checks momentarily only for videos embedded in <video> tag
 
         if (stripos($text, '</video>') === false) {
@@ -52,39 +53,32 @@ class filter_opencast extends moodle_text_filter {
         $matches = preg_split('/(<[^>]*>)/i', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         if ($matches) {
-            $issuerid = get_config('filter_opencast', 'issuerid');
-            $issuer = \core\oauth2\api::get_issuer($issuerid);
-            // Get an OAuth client from the issuer.
-            // TODO return url
-            $returnurl = new moodle_url('/filter/opencastfilter/adminsettings.php');
-            $client = \core\oauth2\api::get_user_oauth_client($issuer, $returnurl);
-            $service = new \filter_opencast\rest($client);
-
             // Get me.json
-            $me = $service->call('me', []);
-            file_put_contents($CFG->dirroot . '\filter\opencast\info\me.json', $me);
+            filter_opencast_load_meInfo();
+
+            $video = false;
 
             foreach ($matches as $match) {
                 if (substr($match, 0, 6) === "<video") {
-                    // Replace it
-                    // TODO
-                    $id = substr($match, strpos($match, 'id=') + 4, 36);
-                    // Get episode.json
-                    $id = '0cc5a97c-82fd-4358-9266-351dc1b1b046';
-                    $params = ['id' => $id];
-                    $episode = $service->call('episode', $params);
-                    file_put_contents($CFG->dirroot . '\filter\opencast\info\episode.json', $episode);
+                    $video = true;
+                } else if ($video) {
+                    $video = false;
+                    if (substr($match, 0, 7) === "<source") {
+                        // Extract id
+                        $id = substr($match, strpos($match, 'api/') + 4, 36);
 
-                    $player = '<iframe src="'.$CFG->wwwroot.'/filter/opencast/player/core.html" width="100%" height="400px"></iframe>';
-		            $text = preg_replace('/<video.*<\/video>/', $player, $text, 1);
+                        $player = '<iframe src="" data-frameSrc="' . $CFG->wwwroot . '/filter/opencast/player/core.html?id='.$id.'" width="80%" height="450px" class="ocplayer"></iframe>';
+                        $link = get_config('filter_opencast', 'baseurlapi') . '/engage/theodul/ui/core.html?id=' . $id;
+                        $newtext = $player . '<a style="display:block;" href="' . $link . '">Zum Video</a>';
+                        $text = preg_replace('/<video.*<\/video>/', $newtext, $text, 1);
+
+                    }
                 }
             }
         }
 
-        $newtext = $text;
-
         // Return the same string except processed by the above.
-        return $newtext;
+        return $text;
     }
 
 

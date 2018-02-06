@@ -23,8 +23,8 @@
 define(["jquery", "backbone", "engage/core", "../models/footprint"], function($, Backbone, Engage, FootprintModel) {
     "use strict";
 
-    var USERTRACKING_ENDPOINT = "/usertracking";
-    var USERTRACKING_ENDPOINT_FOOTPRINTS = "../info/footprint.json";
+    var USERTRACKING_ENDPOINT = opencastlink+"/usertracking";
+    var USERTRACKING_ENDPOINT_FOOTPRINTS = opencastlink+"/info/footprint.json";
 
     var mediaPackageID = Engage.model.get("urlParameters").id;
     if (!mediaPackageID) {
@@ -34,6 +34,14 @@ define(["jquery", "backbone", "engage/core", "../models/footprint"], function($,
     var FootprintCollection = Backbone.Collection.extend({
         model: FootprintModel,
         url: USERTRACKING_ENDPOINT_FOOTPRINTS,
+        sync: function(method, model, options) {
+            options ||(options = {});
+
+            options.crossDomain = true;
+            options.xhrFields = {withCredentials:true};
+
+            return Backbone.sync(method, model, options);
+        },
         initialize: function() {
             this.update();
         },

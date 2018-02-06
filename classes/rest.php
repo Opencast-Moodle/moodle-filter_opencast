@@ -11,15 +11,17 @@ class rest extends \core\oauth2\rest {
      *  [ 'listFiles' => [ 'method' => 'get', 'endpoint' => 'http://...', 'args' => [ 'folder' => PARAM_STRING ] ] ]
      */
     public function get_api_functions() {
+        $baseurl = get_config('filter_opencast', 'baseurlapi');
+
         return [
             'me' => [
-                'endpoint' => 'https://electures.uni-muenster.de/info/me.json',
+                'endpoint' => $baseurl . '/info/me.json',
                 'method' => 'get',
                 'args' => [],
                 'response' => 'raw'
             ],
             'episode' => [
-                'endpoint' => 'https://electures.uni-muenster.de/search/episode.json',
+                'endpoint' => $baseurl . '/search/episode.json',
                 'method' => 'get',
                 'args' => [
                     'id' => PARAM_RAW
@@ -27,7 +29,7 @@ class rest extends \core\oauth2\rest {
                 'response' => 'raw'
             ],
             'footprint' => [
-                'endpoint' => 'https://electures.uni-muenster.de/usertracking/footprint.json',
+                'endpoint' => $baseurl . '/usertracking/footprint.json',
                 'method' => 'get',
                 'args' => [
                     'id' => PARAM_RAW

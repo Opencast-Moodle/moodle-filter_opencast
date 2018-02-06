@@ -33,4 +33,6 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configselect('filter_opencast/issuerid', get_string('setting_issuer', 'filter_opencast'),
         get_string('setting_issuer_desc', 'filter_opencast'), 0, $choices));
+    $settings->add(new admin_setting_configtext('filter_opencast/baseurlapi', get_string('setting_baseurlapi', 'filter_opencast'),
+        get_string('setting_baseurlapi_desc', 'filter_opencast'), ''));
 }

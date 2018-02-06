@@ -27,3 +27,5 @@ $string['filtername'] = 'Opencast';
 $string['pluginname'] = 'Opencast Filter';
 $string['setting_issuer'] = 'Issuer';
 $string['setting_issuer_desc'] = 'Issuer Desc';
+$string['setting_baseurlapi'] = 'Opencast API url';
+$string['setting_baseurlapi_desc'] = 'Setup the base url of the Opencast system, for example: opencast.example.com';

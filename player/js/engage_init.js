@@ -38,5 +38,6 @@ requirejs.config({
 });
 
 var PLUGIN_PATH = "../../plugin/";
+var opencastlink = "http://localhost:8080";
 // start core logic
 require(["engage/core"]);

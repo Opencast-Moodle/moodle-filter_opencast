@@ -20,7 +20,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['jquery', 'backbone'], function($, Backbone) {
+define(['jquery', 'backbone'], function ($, Backbone) {
     "use strict";
 
     var prop_shortcut = "player.shortcut.",
@@ -47,8 +47,17 @@ define(['jquery', 'backbone'], function($, Backbone) {
      * Model with information about the current user and the current MH configuration
      */
     var MeInfoModel = Backbone.Model.extend({
-        urlRoot: "../info/me.json",
-        initialize: function() {
+        urlRoot: opencastlink+"/info/me.json",
+        sync: function(method, model, options) {
+            options ||(options = {});
+
+            options.type = 'get';
+            options.crossDomain = true;
+            options.xhrFields = {withCredentials:true};
+
+            return Backbone.sync(method, model, options);
+        },
+        initialize: function () {
             this.fetch({
                 success: function(me) {
                     var shortcuts = new Array(),
@@ -69,7 +78,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                         piwik_track_events;
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
                         // extract shortcuts
-                        $.each(me.attributes.org.properties, function(key, value) {
+                        $.each(me.attributes.org.properties, function (key, value) {
                             var name = key.substring(prop_shortcut.length, key.length);
                             // shortcuts
                             if ((key.indexOf(prop_shortcut) != -1) && (name.length > 0) && value) {
@@ -124,20 +133,20 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             }
                             // hide video context menu
                             else if ((key == prop_hide_video_context_menu) && value) {
-                              if (value.trim() == "true") hide_video_context_menu = true;
+                                if (value.trim() == "true") hide_video_context_menu = true;
                             }
                             // Piwik-Settings
                             else if ((key == prop_piwik_server) && value) {
-                              piwik_server = value;
+                                piwik_server = value;
                             }
                             else if ((key == prop_piwik_site_id) && value) {
-                              piwik_site_id = value;
+                                piwik_site_id = value;
                             }
                             else if ((key == prop_piwik_heartbeat) && value) {
-                              piwik_heartbeat = value;
+                                piwik_heartbeat = value;
                             }
                             else if ((key == prop_piwik_track_events) && value) {
-                              piwik_track_events = value;
+                                piwik_track_events = value;
                             }
                         });
                     }
@@ -161,10 +170,10 @@ define(['jquery', 'backbone'], function($, Backbone) {
                 }
             });
         },
-        ready: function() {
+        ready: function () {
             return ready;
         },
-        getPositionControls: function() {
+        getPositionControls: function () {
             return positioncontrols;
         }
     });

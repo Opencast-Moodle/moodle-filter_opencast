@@ -95,14 +95,14 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     }
 
     /* change these variables */
-    var SEARCH_ENDPOINT = "/search/episode.json";
+    var SEARCH_ENDPOINT = opencastlink+"/search/episode.json";
 
     /* don't change these variables */
-    var initCount = 5;
+    var initCount = 3; // decreased init count due to disabling footprint, viewsmodel
     var InfoMeModel;
     var MediaPackageModel;
-    var ViewsModel;
-    var FootprintCollection;
+ //   var ViewsModel;
+   // var FootprintCollection;
     var mediaPackageID = "";
     var mediaPackage; // mediaPackage data
     var mediaInfo; // media info like video tracks and attachments
@@ -179,8 +179,8 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
             initTranslate(Engage.model.get("language"));
             Engage.model.set("infoMe", new InfoMeModel());
             Engage.model.set("mediaPackage", new MediaPackageModel());
-            Engage.model.set("views", new ViewsModel());
-            Engage.model.set("footprints", new FootprintCollection());
+       //     Engage.model.set("views", new ViewsModel());
+          //  Engage.model.set("footprints", new FootprintCollection());
         }
     }
 
@@ -256,16 +256,16 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     });
 
     // load views model
-    require([relative_plugin_path + "models/views"], function(model) {
+/*    require([relative_plugin_path + "models/views"], function(model) {
         Engage.log("MhConnection: ViewsModel loaded");
         ViewsModel = model;
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
         }
-    });
+    });*/
 
-    // load footprint collection
+/*    // load footprint collection, disable footprint
     require([relative_plugin_path + "collections/footprint"], function(collection) {
         Engage.log("MhConnection: FootprintCollection loaded");
         FootprintCollection = collection;
@@ -273,7 +273,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         if (initCount <= 0) {
             initPlugin();
         }
-    });
+    });*/
 
     return plugin;
 });

@@ -28,7 +28,7 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
         mediaPackageLoaded: new Engage.Event("MhConnection:mediaPackageLoaded", "A mediapackage has been loaded", "trigger")
     };
 
-    var SEARCH_ENDPOINT = "../info/episode.json";
+    var SEARCH_ENDPOINT = opencastlink+"/search/episode.json";
 
     var mediaPackageID = Engage.model.get("urlParameters").id;
     if (!mediaPackageID) {
@@ -37,6 +37,15 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
 
     var MediaPackageModel = Backbone.Model.extend({
         urlRoot: SEARCH_ENDPOINT,
+        sync: function(method, model, options) {
+            options ||(options = {});
+
+            options.type = 'get';
+            options.crossDomain = true;
+            options.xhrFields = {withCredentials:true};
+
+            return Backbone.sync(method, model, options);
+        },
         initialize: function() {
             Engage.log("MhConnection: Init MediaPackage model");
             this.update();

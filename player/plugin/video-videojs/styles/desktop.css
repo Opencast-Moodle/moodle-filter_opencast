@@ -4,7 +4,7 @@
 
 .videojs_wrapper {
     width: 100%;
-    height: 100%;
+    /*height: 100%;*/
     position: relative;
     margin: 0 auto;
     cursor: pointer;
@@ -30,7 +30,7 @@
 
 .videoFrame {
     width: 100%;
-    height: 100%;
+    /*height: 100%;*/
 }
 
 .videoFocusedPiP {

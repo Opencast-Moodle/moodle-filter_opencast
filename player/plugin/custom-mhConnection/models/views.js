@@ -34,8 +34,8 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         }
     });
 
-    var USERTRACKING_ENDPOINT = "/usertracking";
-    var USERTRACKING_ENDPOINT_STATS = "/stats.json";
+    var USERTRACKING_ENDPOINT = opencastlink+"/usertracking";
+    var USERTRACKING_ENDPOINT_STATS = opencastlink+"/stats.json";
 
     var mediaPackageID = Engage.model.get("urlParameters").id;
     if (!mediaPackageID) {
@@ -44,6 +44,14 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
     var ViewsModel = Backbone.Model.extend({
         urlRoot: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_STATS,
+        sync: function(method, model, options) {
+            options ||(options = {});
+
+            options.crossDomain = true;
+            options.xhrFields = {withCredentials:true};
+
+            return Backbone.sync(method, model, options);
+        },
         initialize: function() {
             Engage.log("MhConnection: Init Views model");
             this.put();
