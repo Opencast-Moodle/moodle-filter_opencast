@@ -51,6 +51,7 @@ class filter_opencast extends moodle_text_filter {
         $matches = preg_split('/(<[^>]*>)/i', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         if ($matches) {
+            $renderer = $PAGE->get_renderer('filter_opencast');
 
             // Login if user is not logged in yet.
             $loggedin = true;
@@ -84,18 +85,17 @@ class filter_opencast extends moodle_text_filter {
                         $id = substr($match, strpos($match, 'api/') + 4, 36);
                         $src = $CFG->wwwroot . '/filter/opencast/player/core.html?id=' . $id . '&ocurl=' . urlencode($apiurl);
 
-                        if ($loggedin) {
-                            // Set the source attribute directly.
-                            $player = '<iframe src="' . $src . '" width="95%" height="455px" class="ocplayer"></iframe>';
-                        } else {
-                            // Set the source attribute after login.
-                            $player = '<iframe data-frameSrc="' . $src . '" width="95%" height="455px" class="ocplayer"></iframe>';
-
-                        }
-
+                        // Create link to video.
                         $link = $apiurl . '/engage/theodul/ui/core.html?id=' . $id;
-                        // Add link to video.
-                        $newtext = $player . '<a style="display:block;" target="_blank" href="' . $link . '">Zum Video</a>';
+
+                        // Collect the needed data being submitted to the template.
+                        $mustachedata = new stdClass();
+                        $mustachedata->loggedin = $loggedin;
+                        $mustachedata->src = $src;
+                        $mustachedata->link = $link;
+
+                        $newtext =  $renderer->render_player($mustachedata);
+
                         // Replace video tag.
                         $text = preg_replace('/<video.*<\/video>/', $newtext, $text, 1);
                     }
