@@ -13,8 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 require_once($CFG->dirroot.'/mod/lti/locallib.php');
+require_once($CFG->dirroot.'/lib/oauthlib.php');
 
 /**
  * Opencast library functions.
@@ -27,76 +27,70 @@ require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
-function filter_opencast_load_meInfo() {
-    global $CFG, $PAGE;
+/**
+ * Use lti to login and retrieve cookie from opencast.
+ */
+function filter_opencast_login() {
+    global $CFG, $PAGE, $COURSE, $USER;
 
-    $urlparts = parse_url($CFG->wwwroot);
-    $orgid = $urlparts['host'];
-
-    $endpoint = 'http://localhost:8080/lti';
-
-    $instance = new stdClass();
-    $instance->course = 2;
-    $instance->typeid = 2;
-    $instance->launchcontainer = 1;
-    $instance->id = 101;
-    $instance->name = 'Opencast';
-    $instance->servicesalt = '5a685957417926.81276553';
-
-    $typeid = 2;
-    $tool = new stdClass();
-    $tool->baseurl = 'http://localhost:8080/lti';
-    $tool->tooldomain = 'localhost:8080';
-    $tool->state = 1;
-    $tool->course = 2;
-    $tool->coursevisible = 1;
-
-    $typeconfig = array();
-    $typeconfig['resourcekey'] = 'myconsumerkey';
-    $typeconfig['password'] = 'myconsumersecret';
-    $typeconfig['sendname'] = 1;
-    $typeconfig['sendemailaddr'] = 1;
-    $typeconfig['acceptgrades'] = 1;
-
-    $urlparts = parse_url($CFG->wwwroot);
-    $typeconfig['organizationid'] = $urlparts['host'];
-
-    $key = $typeconfig['resourcekey'];
-    $secret = $typeconfig['password'];
-    $endpoint = $tool->baseurl;
-    $orgid = $typeconfig['organizationid'];
-    $course = $PAGE->course;
-    $islti2 = isset($tool->toolproxyid);
-
-    $requestparams = lti_build_request($instance, $typeconfig, $course);
-    $requestparams = array_merge($requestparams, lti_build_standard_request($instance, $orgid, $islti2));
-    $launchcontainer = lti_get_launch_container($instance, $typeconfig);
-
-    $target = '';
-    switch($launchcontainer) {
-        case LTI_LAUNCH_CONTAINER_EMBED:
-        case LTI_LAUNCH_CONTAINER_EMBED_NO_BLOCKS:
-            $target = 'iframe';
-            break;
-        case LTI_LAUNCH_CONTAINER_REPLACE_MOODLE_WINDOW:
-            $target = 'frame';
-            break;
-        case LTI_LAUNCH_CONTAINER_WINDOW:
-            $target = 'window';
-            break;
+    // Get api url of opencast.
+    $endpoint = get_config('tool_opencast', 'apiurl');
+    if (strpos($endpoint, 'http') !== 0) {
+        $endpoint = 'http://' . $endpoint;
     }
-    if (!empty($target)) {
-        $requestparams['launch_presentation_document_target'] = $target;
-    }
+    $endpoint .= '/lti';
 
-    $requestparams['launch_presentation_return_url'] = $PAGE->url->out();
-    $parms = lti_sign_parameters($requestparams, $endpoint, "POST", $key, $secret);
+    // Get consumerkey and consumersecret.
+    $consumerkey = get_config('filter_opencast', 'consumerkey');
+    $consumersecret = get_config('filter_opencast', 'consumersecret');
+
+    $helper = new oauth_helper(array('oauth_consumer_key' => $consumerkey,
+        'oauth_consumer_secret' => $consumersecret));
+
+    // Set all necessary parameters.
+    $params = array();
+    $params['oauth_version'] = '1.0';
+    $params['oauth_nonce'] = $helper->get_nonce();
+    $params['oauth_timestamp'] = $helper->get_timestamp();
+    $params['oauth_consumer_key'] = $consumerkey;
+    $params['user_id'] = $USER->id;
+    $params['roles'] = lti_get_ims_role($USER, null, $COURSE->id, false);
+    $params['context_id'] = $COURSE->id;
+    $params['context_label'] = trim($COURSE->shortname);
+    $params['context_title'] = trim($COURSE->fullname);
+    $params['resource_link_title'] = 'Opencast';
+    $params['context_type'] = ($COURSE->format == 'site') ? 'Group' : 'CourseSection';
+    $params['lis_person_name_given'] = $USER->firstname;
+    $params['lis_person_name_family'] =  $USER->lastname;
+    $params['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
+    $params['ext_user_username'] = $USER->username;
+    $params['lis_person_contact_email_primary'] = $USER->email;
+    $params['launch_presentation_locale'] = current_language();
+    $params['ext_lms'] = 'moodle-2';
+    $params['tool_consumer_info_product_family_code'] = 'moodle';
+    $params['tool_consumer_info_version'] = strval($CFG->version);
+    $params['oauth_callback'] = 'about:blank';
+    $params['lti_version'] = 'LTI-1p0';
+    $params['lti_message_type'] = 'basic-lti-launch-request';
+    $urlparts = parse_url($CFG->wwwroot);
+    $params['tool_consumer_instance_guid'] = $urlparts['host'];
+
+    if (!empty($CFG->mod_lti_institution_name)) {
+        $params['tool_consumer_instance_name'] = trim(html_to_text($CFG->mod_lti_institution_name, 0));
+    } else {
+        $params['tool_consumer_instance_name'] = get_site()->shortname;
+    }
+    $params['tool_consumer_instance_description'] = trim(html_to_text(get_site()->fullname, 0));
+
+    $params['launch_presentation_document_target'] = 'iframe';
+    $params['oauth_signature_method'] = 'HMAC-SHA1';
+    $params['oauth_signature'] = $helper->sign("POST", $endpoint, $params, $consumersecret.'&');
 
     $content = "<form action=\"" . $endpoint .
         "\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n";
 
-    // Contruct html for the launch parameters.
-    foreach ($parms as $key => $value) {
+    // Construct html form for the launch parameters.
+    foreach ($params as $key => $value) {
         $key = htmlspecialchars($key);
         $value = htmlspecialchars($value);
         $content .= "<input type=\"hidden\" name=\"{$key}\"";
@@ -107,13 +101,6 @@ function filter_opencast_load_meInfo() {
     $content .= "</form>\n";
 
     echo $content;
+    // Submit form.
     $PAGE->requires->js_call_amd('filter_opencast/form','init');
-}
-
-function filter_opencast_load_episode($service, $id) {
-    global $CFG;
-    // Get episode.json
-    $params = ['id' => $id];
-    $episode = $service->call('episode', $params);
-    file_put_contents($CFG->dirroot . '\filter\opencast\info\episode.json', $episode);
 }

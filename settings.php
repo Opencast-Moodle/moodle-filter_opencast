@@ -15,24 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Settings.
+ * Settings for opencast filter.
  *
- * @package    block_opencast
+ * @package    filter_opencast
  * @copyright  2017 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-
-    $issuers = \core\oauth2\api::get_all_issuers();
-    $choices = array();
-    foreach($issuers as $issuer){
-        $choices[$issuer->get('id')] = $issuer->get('name');
-    }
-
-    $settings->add(new admin_setting_configselect('filter_opencast/issuerid', get_string('setting_issuer', 'filter_opencast'),
-        get_string('setting_issuer_desc', 'filter_opencast'), 0, $choices));
-    $settings->add(new admin_setting_configtext('filter_opencast/baseurlapi', get_string('setting_baseurlapi', 'filter_opencast'),
-        get_string('setting_baseurlapi_desc', 'filter_opencast'), ''));
+    $settings->add(new admin_setting_configtext('filter_opencast/consumerkey', get_string('setting_consumerkey', 'filter_opencast'),
+        get_string('setting_consumerkey_desc', 'filter_opencast'), ''));
+    $settings->add(new admin_setting_configtext('filter_opencast/consumersecret', get_string('setting_consumersecret', 'filter_opencast'),
+        get_string('setting_consumersecret_desc', 'filter_opencast'), ''));
 }

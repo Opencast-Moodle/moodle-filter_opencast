@@ -24,16 +24,16 @@ h1, h2, h3 {
 }
 
 #engage_content {
-    width: 98%;
-    margin: 10px auto;
+    margin: 0px auto;
     min-width: 750px;
+    height: 450px;
 }
 
 #engage_video {
     margin: 0 auto;
-    margin-top: 5px;
     min-width: 600px;
     float: none;
+    height: 80%;
 }
 
 #engage_controls {

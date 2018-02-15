@@ -95,7 +95,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     }
 
     /* change these variables */
-    var SEARCH_ENDPOINT = opencastlink+"/search/episode.json";
+    var SEARCH_ENDPOINT = window.opencastlink+"/search/episode.json";
 
     /* don't change these variables */
     var initCount = 3; // decreased init count due to disabling footprint, viewsmodel

@@ -28,8 +28,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     var PLUGIN_TYPE = 'engage_controls';
     var PLUGIN_VERSION = '1.0';
     var PLUGIN_TEMPLATE_DESKTOP = Engage.controls_top ? 'templates/desktop_top.html' : 'templates/desktop_bottom.html';
-    // provide this additional template if the controls are below the video to have content above the video
-    // var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = Engage.controls_top ? 'none' : 'templates/desktop_top_ifbottom.html';
     // Delete content above the video
     var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = 'none';
     var PLUGIN_TEMPLATE_EMBED = 'templates/embed.html';

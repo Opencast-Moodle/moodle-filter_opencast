@@ -24,6 +24,9 @@
 define(['jquery'], function ($) {
 
     var t = {
+        /*
+         * Submits lti form and updates the source attribute of the video iframes
+         */
         init: function () {
             $('#ltiLaunchForm').submit(function (e) {
                 e.preventDefault();
@@ -43,6 +46,5 @@ define(['jquery'], function ($) {
             $('#ltiLaunchForm').submit();
         }
     };
-
     return t;
 });

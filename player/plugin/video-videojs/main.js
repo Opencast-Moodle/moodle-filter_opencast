@@ -181,7 +181,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var isUsingFlash = false;
     var mastervideotype = '';
     var aspectRatio = null;
-    var singleVideoPaddingTop = '56.25%';
+    var singleVideoPaddingTop = '0';
     var initCount = 7;
     var infoMeChange = 'change:infoMe';
     var mediapackageError = false;
@@ -957,8 +957,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
                 }
             });
         for (var j = 0; j < videoDisplays.length; ++j) {
-            $('#' + videoDisplays[j]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
-            singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + '%';
+       //     $('#' + videoDisplays[j]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
+         //   singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + '%';
         }
     }
 
@@ -1111,8 +1111,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[1] / aspectRatio[2]) * 100]);
             $('.' + id_videoDisplayClass).css('width', '100%');
             for (var i = 0; i < videoDisplays.length; ++i) {
-                $('#' + videoDisplays[i]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
-                singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + '%';
+          //      $('#' + videoDisplays[i]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
+         //       singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + '%';
             }
         } else {
             Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
@@ -1153,7 +1153,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
             $('.' + id_videoDisplayClass).css('width', '100%');
             for (var j = 0; j < videoDisplays.length; ++j) {
-                $('#' + videoDisplays[j]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
+         //       $('#' + videoDisplays[j]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
             }
         } else {
             Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
@@ -1978,7 +1978,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
                     $('.' + videoUnfocusedClass).css('margin-left', marginLeft + '%');
                 } else {
                     var height = $('.' + videoFocusedClass).height();
-                    $('#engage_video').height(height + 10);
+                    //$('#engage_video').height(height + 10);
                 }
 
                 delayedCalculateVideoAreaAspectRatio();
