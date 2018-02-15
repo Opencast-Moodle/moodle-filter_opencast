@@ -39,7 +39,7 @@ define(['jquery'], function($) {
                     xhrFields: {withCredentials: true},
                     data: $('#ltiLaunchForm').serialize(),
                     complete: function () {
-                        $("iframe").each(function () {
+                        $(".ocplayer").each(function () {
                             $(this).attr('src', $(this).data('framesrc'));
                         });
                     }

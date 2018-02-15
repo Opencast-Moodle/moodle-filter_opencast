@@ -57,6 +57,7 @@ function filter_opencast_login() {
     $params['context_id'] = $COURSE->id;
     $params['context_label'] = trim($COURSE->shortname);
     $params['context_title'] = trim($COURSE->fullname);
+    $params['resource_link_id'] = 'o' . random_int(1000,9999) . '-' . random_int(1000,9999);
     $params['resource_link_title'] = 'Opencast';
     $params['context_type'] = ($COURSE->format == 'site') ? 'Group' : 'CourseSection';
     $params['lis_person_name_given'] = $USER->firstname;
@@ -79,7 +80,6 @@ function filter_opencast_login() {
     } else {
         $params['tool_consumer_instance_name'] = get_site()->shortname;
     }
-    $params['tool_consumer_instance_description'] = trim(html_to_text(get_site()->fullname, 0));
 
     $params['launch_presentation_document_target'] = 'iframe';
     $params['oauth_signature_method'] = 'HMAC-SHA1';
