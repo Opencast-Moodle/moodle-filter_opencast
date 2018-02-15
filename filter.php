@@ -53,11 +53,11 @@ class filter_opencast extends moodle_text_filter {
         if ($matches) {
 
             // Login if user is not logged in yet.
-            $loggedIn  = true;
-            if(!isset($_COOKIE['JSESSIONID'])) {
+            $loggedin = true;
+            if (!isset($_COOKIE['JSESSIONID'])) {
                 // Login and set cookie.
                 filter_opencast_login();
-                $loggedIn = false;
+                $loggedin = false;
             }
 
             $video = false;
@@ -72,25 +72,24 @@ class filter_opencast extends moodle_text_filter {
                         $apiurl = get_config('tool_opencast', 'apiurl');
 
                         // Check if video is from opencast.
-                        if(strpos($match, $apiurl) === false) {
+                        if (strpos($match, $apiurl) === false) {
                             continue;
                         }
 
-                        if(strpos($apiurl, 'http') !== 0) {
+                        if (strpos($apiurl, 'http') !== 0) {
                             $apiurl = 'http://' . $apiurl;
                         }
 
                         // Extract id.
                         $id = substr($match, strpos($match, 'api/') + 4, 36);
-                        $src = $CFG->wwwroot . '/filter/opencast/player/core.html?id='.$id.'&ocurl='.urlencode($apiurl);
+                        $src = $CFG->wwwroot . '/filter/opencast/player/core.html?id=' . $id . '&ocurl=' . urlencode($apiurl);
 
-                        if($loggedIn) {
+                        if ($loggedin) {
                             // Set the source attribute directly.
-                            $player = '<iframe src="'. $src .'" width="95%" height="455px" class="ocplayer"></iframe>';
-                        }
-                        else {
+                            $player = '<iframe src="' . $src . '" width="95%" height="455px" class="ocplayer"></iframe>';
+                        } else {
                             // Set the source attribute after login.
-                            $player = '<iframe src="" data-frameSrc="' . $src .'" width="95%" height="455px" class="ocplayer"></iframe>';
+                            $player = '<iframe data-frameSrc="' . $src . '" width="95%" height="455px" class="ocplayer"></iframe>';
 
                         }
 

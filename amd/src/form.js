@@ -36,8 +36,8 @@ define(['jquery'], function ($) {
                     type: 'post',
                     xhrFields: {withCredentials: true},
                     data: $('#ltiLaunchForm').serialize(),
-                    complete: function() {
-                        $("iframe").each(function() {
+                    complete: function () {
+                        $("iframe").each(function () {
                             $(this).attr('src', $(this).data('framesrc'));
                         });
                     }

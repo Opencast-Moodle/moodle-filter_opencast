@@ -1,9 +1,0 @@
-{
-  "search-results": {
-    "offset": "0",
-    "limit": "0",
-    "total": "0",
-    "searchTime": "7",
-    "query": "(id:caffc928\\-255b\\-4a8d\\-8302\\-d91d55c2a126) AND oc_organization:mh_default_org AND (oc_acl_read:ROLE_ANONYMOUS) AND -oc_mediatype:Series AND -oc_deleted:[* TO *]"
-  }
-}

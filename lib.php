@@ -13,9 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-require_once($CFG->dirroot.'/mod/lti/locallib.php');
-require_once($CFG->dirroot.'/lib/oauthlib.php');
-
 /**
  * Opencast library functions.
  *
@@ -26,6 +23,8 @@ require_once($CFG->dirroot.'/lib/oauthlib.php');
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/mod/lti/locallib.php');
+require_once($CFG->dirroot . '/lib/oauthlib.php');
 
 /**
  * Use lti to login and retrieve cookie from opencast.
@@ -44,8 +43,8 @@ function filter_opencast_login() {
     $consumerkey = get_config('filter_opencast', 'consumerkey');
     $consumersecret = get_config('filter_opencast', 'consumersecret');
 
-    $helper = new oauth_helper(array('oauth_consumer_key' => $consumerkey,
-        'oauth_consumer_secret' => $consumersecret));
+    $helper = new oauth_helper(array('oauth_consumer_key'    => $consumerkey,
+                                     'oauth_consumer_secret' => $consumersecret));
 
     // Set all necessary parameters.
     $params = array();
@@ -61,7 +60,7 @@ function filter_opencast_login() {
     $params['resource_link_title'] = 'Opencast';
     $params['context_type'] = ($COURSE->format == 'site') ? 'Group' : 'CourseSection';
     $params['lis_person_name_given'] = $USER->firstname;
-    $params['lis_person_name_family'] =  $USER->lastname;
+    $params['lis_person_name_family'] = $USER->lastname;
     $params['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
     $params['ext_user_username'] = $USER->username;
     $params['lis_person_contact_email_primary'] = $USER->email;
@@ -84,7 +83,7 @@ function filter_opencast_login() {
 
     $params['launch_presentation_document_target'] = 'iframe';
     $params['oauth_signature_method'] = 'HMAC-SHA1';
-    $params['oauth_signature'] = $helper->sign("POST", $endpoint, $params, $consumersecret.'&');
+    $params['oauth_signature'] = $helper->sign("POST", $endpoint, $params, $consumersecret . '&');
 
     $content = "<form action=\"" . $endpoint .
         "\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n";
@@ -102,5 +101,5 @@ function filter_opencast_login() {
 
     echo $content;
     // Submit form.
-    $PAGE->requires->js_call_amd('filter_opencast/form','init');
+    $PAGE->requires->js_call_amd('filter_opencast/form', 'init');
 }
