@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/lib/oauthlib.php');
  * Use lti to login and retrieve cookie from opencast.
  */
 function filter_opencast_login() {
-    global $CFG, $PAGE, $COURSE, $USER;
+    global $PAGE;
 
     // Get api url of opencast.
     $endpoint = get_config('tool_opencast', 'apiurl');
@@ -38,6 +38,20 @@ function filter_opencast_login() {
         $endpoint = 'http://' . $endpoint;
     }
     $endpoint .= '/lti';
+
+    // Create parameters.
+    $params = filter_opencast_create_parameters($endpoint);
+
+    // Render form.
+    $renderer = $PAGE->get_renderer('filter_opencast');
+    echo $renderer->render_player($endpoint, $params);
+
+    // Submit form.
+    $PAGE->requires->js_call_amd('filter_opencast/form', 'init');
+}
+
+function filter_opencast_create_parameters() {
+    global $CFG, $COURSE, $USER;
 
     // Get consumerkey and consumersecret.
     $consumerkey = get_config('filter_opencast', 'consumerkey');
@@ -57,7 +71,7 @@ function filter_opencast_login() {
     $params['context_id'] = $COURSE->id;
     $params['context_label'] = trim($COURSE->shortname);
     $params['context_title'] = trim($COURSE->fullname);
-    $params['resource_link_id'] = 'o' . random_int(1000,9999) . '-' . random_int(1000,9999);
+    $params['resource_link_id'] = 'o' . random_int(1000, 9999) . '-' . random_int(1000, 9999);
     $params['resource_link_title'] = 'Opencast';
     $params['context_type'] = ($COURSE->format == 'site') ? 'Group' : 'CourseSection';
     $params['lis_person_name_given'] = $USER->firstname;
@@ -85,21 +99,5 @@ function filter_opencast_login() {
     $params['oauth_signature_method'] = 'HMAC-SHA1';
     $params['oauth_signature'] = $helper->sign("POST", $endpoint, $params, $consumersecret . '&');
 
-    $content = "<form action=\"" . urlencode($endpoint) .
-        "\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n";
-
-    // Construct html form for the launch parameters.
-    foreach ($params as $key => $value) {
-        $key = htmlspecialchars($key);
-        $value = htmlspecialchars($value);
-        $content .= "<input type=\"hidden\" name=\"{$key}\"";
-        $content .= " value=\"";
-        $content .= $value;
-        $content .= "\"/>\n";
-    }
-    $content .= "</form>\n";
-
-    echo $content;
-    // Submit form.
-    $PAGE->requires->js_call_amd('filter_opencast/form', 'init');
+    return $params;
 }

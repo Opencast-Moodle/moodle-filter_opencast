@@ -45,4 +45,28 @@ class filter_opencast_renderer extends plugin_renderer_base {
     public function render_player($data) {
         return $this->render_from_template('filter_opencast/player', $data);
     }
+
+    /**
+     * Display the lti form.
+     *
+     * @param object $data The prepared variables.
+     * @return string
+     */
+    public function render_lti_form($endpoint, $params) {
+        $content = "<form action=\"" . urlencode($endpoint) .
+            "\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n";
+
+        // Construct html form for the launch parameters.
+        foreach ($params as $key => $value) {
+            $key = htmlspecialchars($key);
+            $value = htmlspecialchars($value);
+            $content .= "<input type=\"hidden\" name=\"{$key}\"";
+            $content .= " value=\"";
+            $content .= $value;
+            $content .= "\"/>\n";
+        }
+        $content .= "</form>\n";
+
+        return $content;
+    }
 }
