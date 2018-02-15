@@ -28,8 +28,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     var PLUGIN_TYPE = 'engage_controls';
     var PLUGIN_VERSION = '1.0';
     var PLUGIN_TEMPLATE_DESKTOP = Engage.controls_top ? 'templates/desktop_top.html' : 'templates/desktop_bottom.html';
-    // provide this additional template if the controls are below the video to have content above the video
-    var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = Engage.controls_top ? 'none' : 'templates/desktop_top_ifbottom.html';
+    // Delete content above the video
+    var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = 'none';
     var PLUGIN_TEMPLATE_EMBED = 'templates/embed.html';
     var PLUGIN_TEMPLATE_MOBILE = 'templates/mobile.html';
     var PLUGIN_STYLES_DESKTOP = [
@@ -69,7 +69,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         sliderMousein: new Engage.Event('Slider:mouseIn', 'the mouse entered the slider', 'trigger'),
         sliderMouseout: new Engage.Event('Slider:mouseOut', 'the mouse is off the slider', 'trigger'),
         sliderMousemove: new Engage.Event('Slider:mouseMoved', 'the mouse is moving over the slider', 'trigger'),
-        sliderMousemovePreview: new Engage.Event('Slider:mouseMovedPreview', 'the mouse is moving over the slider', 'trigger'),
         seek: new Engage.Event('Video:seek', 'seek video to a given position in seconds', 'trigger'),
         seekLeft: new Engage.Event('Video:seekLeft', '', 'trigger'),
         seekRight: new Engage.Event('Video:seekRight', '', 'trigger'),
@@ -159,7 +158,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     var embedHeightThree = 360;
     var embedHeightFour = 480;
     var embedHeightFive = 720;
-    var min_segment_duration = 1000;
+    var min_segment_duration = 5000;
     var logoLink = false;
     var plugin_path = 'plugin/controls/';
     var logo = plugin_path + 'images/logo.png';
@@ -227,18 +226,22 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     var id_playbackRemTime150 = 'playbackRemTime150';
     var id_playbackRemTime200 = 'playbackRemTime200';
     var id_playbackRemTime300 = 'playbackRemTime300';
-    var id_timeline_preview = 'timeline_preview_canvas';
-    var id_timeline_preview_img = 'timeline_preview_canvas_img';
+    var id_loggedInNotLoggedIn = 'loggedInNotLoggedIn';
+    var id_loginlogout = 'loginlogout';
+    var id_str_loginlogout = 'str_loginlogout';
+    var id_dropdownMenuLoginInfo = 'dropdownMenuLoginInfo';
     var class_dropdown = 'dropdown-toggle';
     var videosReady = false;
     var enableFullscreenButton = false;
     var currentTime = 0;
     var videoDataModelChange = 'change:videoDataModel';
+    var infoMeChange = 'change:infoMe';
     var mediapackageChange = 'change:mediaPackage';
     var event_slidestart = 'slidestart';
     var event_slidestop = 'slidestop';
     var event_slide = 'slide';
-    var initCount = 4;
+    var plugin_path = '';
+    var initCount = 5;
     if (isMobileMode) {
         initCount += 3;          // increase initCount, because mobile version loads 3 more libs
     }
@@ -249,11 +252,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     var usingFlash = false;
     var isAudioOnly = false;
     var segments = {};
-    var timelinePreview;
-    var timelinePreviewsImageCount;
-    var timelinePreviewsImageSize = {};
-    var timelinePreviewsTileResolution = {};
-    var timelinePreviewsError = true;
     var mediapackageError = false;
     var aspectRatioTriggered = false;
     var aspectRatioWidth;
@@ -264,8 +262,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     var embedWidthThree;
     var embedWidthFour;
     var embedWidthFive;
+    var loggedIn = false;
     var username = 'Anonymous';
     var translations = new Array();
+    var askedForLogin = false;
+    var springSecurityLoginURL = '/j_spring_security_check';
+    var springSecurityLogoutURL = '/j_spring_security_logout';
+    var springLoggedInStrCheck = '<title>Opencast – Login Page</title>';
     var controlsViewTopIfBottom = undefined;
     var controlsView = undefined;
     var resolutions = undefined;
@@ -315,6 +318,103 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
+    function login() {
+        if (!askedForLogin) {
+            askedForLogin = true;
+            var username = 'User';
+            var password = 'Password';
+
+            Bootbox.dialog({
+                title: translate('loginInformation', 'Log in'),
+                message: '<form class="form-signin">' +
+                '<h2 class="form-signin-heading">' + translate('enterUsernamePassword', 'Please enter your username and password') + '</h2>' +
+                '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate('username', 'Username') + '" required="true" autofocus="" />' +
+                '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate('password', 'Password') + '" required="true" />' +
+                '<label class="checkbox">' +
+                '<input type="checkbox" value="' + translate('rememberMe', 'Remember me') + '" id="rememberMe" name="rememberMe" checked> ' + translate('rememberMe', 'Remember me') +
+                '</label>' +
+                '</form>',
+                buttons: {
+                    cancel: {
+                        label: translate('cancel', 'Cancel'),
+                        className: 'btn-default',
+                        callback: function () {
+                            askedForLogin = false;
+                        }
+                    },
+                    login: {
+                        label: translate('login', 'Log in'),
+                        className: 'btn-success',
+                        callback: function () {
+                            var username = $('#username').val().trim();
+                            var password = $('#password').val().trim();
+                            if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: springSecurityLoginURL,
+                                    data: {
+                                        'j_username': username,
+                                        'j_password': password,
+                                        '_spring_security_remember_me': $('#rememberMe').is(':checked')
+                                    }
+                                }).done(function (msg) {
+                                    password = '';
+                                    if (msg.indexOf(springLoggedInStrCheck) == -1) {
+                                        Engage.trigger(events.customSuccess.getName(), translate('loginSuccessful', 'Successfully logged in. Please reload the page if the page does not reload automatically.'));
+                                        location.reload();
+                                    } else {
+                                        Engage.trigger(events.customSuccess.getName(), translate('loginFailed', 'Failed to log in.'));
+                                    }
+                                    askedForLogin = false;
+                                }).fail(function (msg) {
+                                    password = '';
+                                    Engage.trigger(events.customSuccess.getName(), translate('loginFailed', 'Failed to log in.'));
+                                    askedForLogin = false;
+                                });
+                            } else {
+                                askedForLogin = false;
+                            }
+                        }
+                    }
+                },
+                className: 'usernamePassword-modal',
+                onEscape: function () {
+                    askedForLogin = false;
+                },
+                closeButton: false
+            });
+        }
+    }
+
+    function logout() {
+        Engage.trigger(events.customSuccess.getName(), translate('loggingOut', 'You are being logged out, please wait a moment.'));
+        $.ajax({
+            type: 'GET',
+            url: springSecurityLogoutURL,
+        }).complete(function (msg) {
+            location.reload();
+            Engage.trigger(events.customSuccess.getName(), translate('logoutSuccessful', 'Successfully logged out. Please reload the page if the page does not reload automatically.'));
+        });
+    }
+
+    function checkLoginStatus() {
+        $('#' + id_loginlogout).unbind('click');
+        if (Engage.model.get('infoMe').loggedIn) {
+            loggedIn = true;
+            username = Engage.model.get('infoMe').username;
+            $('#' + id_loggedInNotLoggedIn).html(username);
+            $('#' + id_str_loginlogout).html(translate('logout', 'Log out'));
+            $('#' + id_loginlogout).click(logout);
+        } else {
+            loggedIn = false;
+            username = 'Anonymous';
+            $('#' + id_loggedInNotLoggedIn).html(translate('loggedOut', 'Logged out'));
+            $('#' + id_str_loginlogout).html(translate('login', 'Log in'));
+            $('#' + id_loginlogout).click(login);
+        }
+        $('#' + id_dropdownMenuLoginInfo).removeClass('disabled');
+    }
+
     var ControlsView = Backbone.View.extend({
         el: $('#' + id_engage_controls), // every view has an element associated with it
         initialize: function (videoDataModel, template, plugin_path) {
@@ -341,48 +441,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
                 segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
 
-                try {
-                    // find timeline preview images in media package
-                    var attachments = Engage.model.get('mediaPackage').get('attachments');
-
-                    var timelinePreviewsRegex = /(timeline)+\S*(preview)+/i;
-                    timelinePreview = $(attachments).filter(function (index) {
-                        return $(attachments[index]).attr('type').search(timelinePreviewsRegex) !== -1;
-                    });
-
-                    console.log("timelinePreviews loaded: ", timelinePreview);
-
-                    var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
-
-                    timelinePreviewsProperties.property.forEach(function (property) {
-                        switch (property.key) {
-                            case "imageCount":
-                                timelinePreviewsImageCount = property.$;
-                                break;
-                            case "imageSizeX":
-                                timelinePreviewsImageSize[0] = property.$;
-                                break;
-                            case "imageSizeY":
-                                timelinePreviewsImageSize[1] = property.$;
-                                break;
-                            case "resolutionX":
-                                timelinePreviewsTileResolution[0] = property.$;
-                                break;
-                            case "resolutionY":
-                                timelinePreviewsTileResolution[1] = property.$;
-                                break;
-                        }
-                    });
-
-                    timelinePreviewsError = false;
-
-                } catch (e) {
-                    timelinePreviewsError = true;
-                    console.error("No valid timelinepreviews image was found.", e);
+                if (Engage.model.get('meInfo')) {
+                    if (Engage.model.get('meInfo').get('logo_player')) {
+                        logo = Engage.model.get('meInfo').get('logo_player');
+                    }
+                    if (Engage.model.get('meInfo').get('link_mediamodule')) {
+                        logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html'; // link to the media module
+                    }
+                    if (!Engage.model.get('meInfo').get('show_embed_links')) {
+                        showEmbed = false;
+                    }
                 }
-
-                logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html'; // link to the media module
-                showEmbed = false;
                 var translatedQualities = new Array();
                 if (resolutions) {
                     for (var i = 0; i < resolutions.length; i++) {
@@ -412,6 +481,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                     str_playbackRate: translate('playbackRate', 'Playback rate'),
                     str_remainingTime: translate('remainingTime', 'remaining time'),
                     str_embedButton: translate('embedButton', 'Embed Button. Select embed size from dropdown.'),
+                    loggedIn: false,
+                    str_checkingStatus: translate('checkingLoginStatus', 'Checking login status...'),
+                    str_loginLogout: translate('loginLogout', 'Login/Logout'),
                     str_fullscreen: translate('fullscreen', 'Fullscreen'),
                     str_qualityButton: translate('quality', 'Quality'),
                     str_quality: translate('quality', 'Quality'),
@@ -476,7 +548,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                 playPause();
                 timeUpdate();
                 addNonFlashEvents();
-                setTimelinePreviewsImage();
+                checkLoginStatus();
             }
         }
     });
@@ -498,14 +570,26 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         },
         render: function () {
             if (!mediapackageError) {
-                logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html'; // link to the media module
-                showEmbed = false;
+                if (Engage.model.get('meInfo')) {
+                    if (Engage.model.get('meInfo').get('logo_player')) {
+                        logo = Engage.model.get('meInfo').get('logo_player');
+                    }
+                    if (Engage.model.get('meInfo').get('link_mediamodule')) {
+                        logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html'; // link to the media module
+                    }
+                    if (!Engage.model.get('meInfo').get('show_embed_links')) {
+                        showEmbed = false;
+                    }
+                }
                 var tempVars = {
                     plugin_path: this.pluginPath,
                     logoLink: logoLink,
                     str_openMediaModule: translate('openMediaModule', 'Go to Media Module'),
                     str_embedButton: translate('embedButton', 'Embed Button. Select embed size from dropdown.'),
                     str_fullscreen: translate('fullscreen', 'Fullscreen'),
+                    loggedIn: false,
+                    str_checkingStatus: translate('checkingLoginStatus', 'Checking login status...'),
+                    str_loginLogout: translate('loginLogout', 'Login/Logout'),
                     logo: logo,
                     show_embed: showEmbed
                 };
@@ -689,6 +773,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         if (Basil.get(storage_pip_pos) !== undefined && Basil.get(storage_pip_pos) !== null) {
             var pipPos = Basil.get(storage_pip_pos);
             Engage.trigger(plugin.events.movePiP.getName(), pipPos);
+        } else {
+            if (Engage.model.get('meInfo').get('layout') !== 'off') {
+                var pipPos = Engage.model.get('meInfo').get('layout');
+                Engage.trigger(plugin.events.movePiP.getName(), pipPos);
+            }
         }
         if (Basil.get(storage_pip) !== undefined && Basil.get(storage_pip) !== null) {
             var pip = Basil.get(storage_pip);
@@ -696,11 +785,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                 Engage.trigger(plugin.events.togglePiP.getName(), pip);
             }
         } else {
-            Engage.trigger(plugin.events.togglePiP.getName(), false);
+            if (Engage.model.get('meInfo').get('layout') === 'off' ||
+                Engage.model.get('meInfo').get('layout') === 'beside') {
+                Engage.trigger(plugin.events.togglePiP.getName(), false);
+            } else {
+                Engage.trigger(plugin.events.togglePiP.getName(), true);
+            }
         }
         if (Basil.get(storage_focus_video) !== undefined && Basil.get(storage_focus_video) !== null) {
             var focusVideo = Basil.get(storage_focus_video);
             currentFocusFlavor = focusVideo;
+        } else {
+            if (Engage.model.get('meInfo').get('layout') !== 'off') {
+                currentFocusFlavor = Engage.model.get('meInfo').get('focusedflavor');
+            }
         }
     }
 
@@ -811,13 +909,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                 isSliding = false;
                 Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
             });
-            $('#' + id_slider).on(event_slide, function (e) {
-                Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
-            });
             $('#' + id_slider).mouseover(function (e) {
                 e.preventDefault();
                 Engage.trigger(plugin.events.sliderMousein.getName());
-            }).mouseleave(function (e) {
+            }).mouseout(function (e) {
                 e.preventDefault();
                 Engage.trigger(plugin.events.sliderMouseout.getName());
             }).mousemove(function (e) {
@@ -826,7 +921,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                 var dur = (duration && (duration > 0)) ? duration : 1;
                 currPos = (currPos < 0) ? 0 : ((currPos > 1) ? 1 : currPos);
                 Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
-                Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
             });
             // volume event
             $('#' + id_volumeSlider).on(event_slide, function (event, ui) {
@@ -856,9 +950,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                     }).mouseout(function (e) {
                         e.preventDefault();
                         Engage.trigger(plugin.events.segmentMouseout.getName(), i);
-                    }).mousemove(function (e) {
-                        e.preventDefault();
-                        Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
                     });
                 });
             }
@@ -1094,26 +1185,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         }
     };
 
-    function setTimelinePreviewsImage() {
-        if (!timelinePreviewsError) {
-            try {
-                $('#' + id_timeline_preview_img).attr('src', timelinePreview.get(0).url);
-
-                // if no valid resolution is stored within the timeline previews attachment, read out the size of the image
-                if (typeof timelinePreviewsTileResolution[0] === 'undefined' || timelinePreviewsTileResolution[0] <= 0
-                    || typeof timelinePreviewsTileResolution[1] === 'undefined' || timelinePreviewsTileResolution[1] <= 0) {
-                    var img = document.getElementById(id_timeline_preview_img);
-
-                    timelinePreviewsTileResolution[0] = img.naturalWidth / timelinePreviewsImageSize[0];
-                    timelinePreviewsTileResolution[1] = img.naturalHeight / timelinePreviewsImageSize[1];
-                }
-            } catch (ex) {
-                timelinePreviewsError = true;
-                console.log("The timeline previews image cannot be set or the resolution cannot be found", ex);
-            }
-        }
-    }
-
     /**
      * Initializes the plugin
      */
@@ -1314,86 +1385,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             Engage.on(plugin.events.segmentMouseover.getName(), function (no) {
                 if (!mediapackageError) {
                     $('#' + id_segmentNo + no).addClass('segmentHover');
-                    if (!timelinePreviewsError) {
-                        $('#' + id_timeline_preview).addClass('timelinePreviewHover');
-                    }
                 }
             });
             Engage.on(plugin.events.segmentMouseout.getName(), function (no) {
                 if (!mediapackageError) {
                     $('#' + id_segmentNo + no).removeClass('segmentHover');
-                    $('#' + id_timeline_preview).removeClass('timelinePreviewHover');
-                }
-            });
-            Engage.on(plugin.events.sliderMouseout.getName(), function () {
-                if (!mediapackageError) {
-                    $('#' + id_timeline_preview).removeClass('timelinePreviewHover');
-                }
-            });
-            Engage.on(plugin.events.sliderMousemovePreview.getName(), function (pos) {
-                if (!mediapackageError && !timelinePreviewsError) {
-                    $('#' + id_timeline_preview).addClass('timelinePreviewHover');
-
-                    // get number of saved preview images in the timeline preview image
-                    var imageSize = timelinePreviewsImageSize;
-
-                    // size of each of the images
-                    var width = timelinePreviewsTileResolution[0];
-                    var height = timelinePreviewsTileResolution[1];
-
-                    // make sure the image size was set correctly
-                    if (width <= 0 || height <= 0) {
-                        setTimelinePreviewsImage();
-                        width = timelinePreviewsTileResolution[0];
-                        height = timelinePreviewsTileResolution[1];
-                    }
-
-                    var wrapperOffset = Math.ceil($('#' + id_slider).offset().left);
-
-                    // calculate position on timeline, so that it ranges from 0 at the start to 1 at the end of the video
-                    var posPercent = ((pos - wrapperOffset) / $('#' + id_slider).width());
-
-                    // index of the image that previews that part of the video
-                    var num = (timelinePreviewsImageCount) * posPercent;
-                    if (num < 0) {
-                        num = 0;
-                    }
-                    if (num >= (timelinePreviewsImageCount)) {
-                        num = (timelinePreviewsImageCount) - 1;
-                    }
-
-                    // position of this image in the timeline previews image
-                    var offsetX = width * Math.floor(num % imageSize[0]);
-                    var offsetY = height * Math.floor(num / imageSize[1]);
-
-                    var pageWidth = $(window).width();
-
-                    // draw only the current preview image into the canvas
-                    var canvas = document.getElementById(id_timeline_preview);
-                    canvas.width = width;
-                    canvas.height = height;
-                    var ctx = canvas.getContext("2d");
-                    var img = document.getElementById(id_timeline_preview_img);
-                    ctx.drawImage(img, offsetX, offsetY, width, height, 0, 0, width, height);
-
-                    var wrapperHeight = $('#navigation_wrapper').height();
-                    var offsetLeft = (pos - wrapperOffset) - (width / 2);
-
-                    // clamp left: in case the preview image would exceed the page on the left, move it back to window border
-                    if (pos < width / 2) {
-                        offsetLeft = -wrapperOffset;
-                    }
-
-                    // clamp right: in case the preview image would exceed the page on the right, move it back to window border
-                    if (pos > pageWidth - (width + 6) / 2) {
-                        offsetLeft = (pageWidth - (width + 3)) - wrapperOffset;
-                    }
-
-                    var offsetBottom = Engage.controls_top ? 0 : canvas.height + wrapperHeight + 10;
-
-                    // move the image to the mouse position at a fixed height above the timeline
-                    $('#' + id_timeline_preview).css({'bottom': Math.round(offsetBottom) + 'px'});
-                    $('#' + id_timeline_preview).css({'left': Math.round(offsetLeft) + 'px'});
                 }
             });
 
@@ -1499,7 +1495,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             });
 
             if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != 'none')) {
-                controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get('videoDataModel'), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
+                // Don't show controls above video
+                // controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get('videoDataModel'), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
             }
             controlsView = new ControlsView(Engage.model.get('videoDataModel'), plugin.template, plugin.pluginPath);
 
@@ -1510,6 +1507,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     // init event
     Engage.log('Controls: Init');
     var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
+
+    // listen on a change/set of the InfoMe model
+    Engage.model.on(infoMeChange, function () {
+        initCount -= 1;
+        if (initCount == 0) {
+            initPlugin();
+        }
+    });
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function () {

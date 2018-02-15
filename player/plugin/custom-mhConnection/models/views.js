@@ -34,20 +34,44 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         }
     });
 
+    var USERTRACKING_ENDPOINT = opencastlink+"/usertracking";
+    var USERTRACKING_ENDPOINT_STATS = opencastlink+"/stats.json";
+
     var mediaPackageID = Engage.model.get("urlParameters").id;
     if (!mediaPackageID) {
         mediaPackageID = "";
     }
 
     var ViewsModel = Backbone.Model.extend({
-        urlRoot: "",
+        urlRoot: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_STATS,
+        sync: function(method, model, options) {
+            options ||(options = {});
+
+            options.crossDomain = true;
+            options.xhrFields = {withCredentials:true};
+
+            return Backbone.sync(method, model, options);
+        },
         initialize: function() {
             Engage.log("MhConnection: Init Views model");
             this.put();
         },
         put: function() {
-            // TODO
-            Engage.log("MhConnection: Adding user to viewers - Do nothing");
+            Engage.log("MhConnection: Adding user to viewers");
+            var thisModel = this;
+            $.ajax({
+                type: "PUT",
+                url: USERTRACKING_ENDPOINT,
+                data: {
+                    id: mediaPackageID,
+                    in : 0,
+                    out: 0,
+                    type: "VIEWS"
+                },
+                success: function(result) {
+                    thisModel.update();
+                }
+            });
         },
         update: function() {
             // request model data

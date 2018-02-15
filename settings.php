@@ -15,15 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Opencast filter settings
+ * Settings for opencast filter.
  *
- * @package    filter_opencastfilter
+ * @package    filter_opencast
  * @copyright  2017 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-
+    $settings->add(new admin_setting_configtext('filter_opencast/consumerkey', get_string('setting_consumerkey', 'filter_opencast'),
+        get_string('setting_consumerkey_desc', 'filter_opencast'), ''));
+    $settings->add(new admin_setting_configtext('filter_opencast/consumersecret', get_string('setting_consumersecret', 'filter_opencast'),
+        get_string('setting_consumersecret_desc', 'filter_opencast'), ''));
 }
