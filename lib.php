@@ -85,7 +85,7 @@ function filter_opencast_login() {
     $params['oauth_signature_method'] = 'HMAC-SHA1';
     $params['oauth_signature'] = $helper->sign("POST", $endpoint, $params, $consumersecret . '&');
 
-    $content = "<form action=\"" . $endpoint .
+    $content = "<form action=\"" . urlencode($endpoint) .
         "\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm\" method=\"post\" encType=\"application/x-www-form-urlencoded\">\n";
 
     // Construct html form for the launch parameters.

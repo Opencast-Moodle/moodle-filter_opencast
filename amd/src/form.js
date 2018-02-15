@@ -21,17 +21,19 @@
  * @copyright  2018 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery'], function ($) {
+define(['jquery'], function($) {
 
     var t = {
         /*
          * Submits lti form and updates the source attribute of the video iframes
          */
-        init: function () {
-            $('#ltiLaunchForm').submit(function (e) {
+        init: function() {
+            $('#ltiLaunchForm').submit(function(e) {
                 e.preventDefault();
+                var ocurl = decodeURIComponent($(this).attr("action"));
+
                 $.ajax({
-                    url: 'http://localhost:8080/lti',
+                    url: ocurl,
                     crossDomain: true,
                     type: 'post',
                     xhrFields: {withCredentials: true},
