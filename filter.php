@@ -69,24 +69,28 @@ class filter_opencast extends moodle_text_filter {
                 } else if ($video) {
                     $video = false;
                     if (substr($match, 0, 7) === "<source") {
-                        // Get apiurl from opencast tool.
-                        $apiurl = get_config('tool_opencast', 'apiurl');
+                        // Get baseurl either from engageurl setting or from opencast tool.
+                        $baseurl = get_config('filter_opencast', 'engageurl');
+                        if (empty($baseurl)) {
+                            $baseurl = get_config('tool_opencast', 'apiurl');
+                        }
+
 
                         // Check if video is from opencast.
-                        if (strpos($match, $apiurl) === false) {
+                        if (strpos($match, $baseurl) === false) {
                             continue;
                         }
 
-                        if (strpos($apiurl, 'http') !== 0) {
-                            $apiurl = 'http://' . $apiurl;
+                        if (strpos($baseurl, 'http') !== 0) {
+                            $baseurl = 'http://' . $baseurl;
                         }
 
                         // Extract id.
                         $id = substr($match, strpos($match, 'api/') + 4, 36);
-                        $src = $CFG->wwwroot . '/filter/opencast/player/core.html?id=' . $id . '&ocurl=' . urlencode($apiurl);
+                        $src = $CFG->wwwroot . '/filter/opencast/player/core.html?id=' . $id . '&ocurl=' . urlencode($baseurl);
 
                         // Create link to video.
-                        $link = $apiurl . '/engage/theodul/ui/core.html?id=' . $id;
+                        $link = $baseurl . '/engage/theodul/ui/core.html?id=' . $id;
 
                         // Collect the needed data being submitted to the template.
                         $mustachedata = new stdClass();

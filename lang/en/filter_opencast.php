@@ -29,3 +29,5 @@ $string['setting_consumerkey'] = 'Consumer key';
 $string['setting_consumerkey_desc'] = 'LTI Consumer key';
 $string['setting_consumersecret'] = 'Consumer secret';
 $string['setting_consumersecret_desc'] = 'LTI Consumer secret';
+$string['setting_engageurl'] = 'URL of the Opencast Engange server';
+$string['setting_engageurl_desc'] = 'If empty, the base URL of the admin tool is used.';
