@@ -32,8 +32,8 @@ require_once($CFG->dirroot . '/lib/oauthlib.php');
 function filter_opencast_login() {
     global $PAGE;
 
-    // Get api url of opencast.
-    $endpoint = get_config('tool_opencast', 'apiurl');
+    // Get url of opencast engage server
+    $endpoint = get_config('filter_opencast', 'engageurl');
     if (strpos($endpoint, 'http') !== 0) {
         $endpoint = 'http://' . $endpoint;
     }
@@ -44,13 +44,13 @@ function filter_opencast_login() {
 
     // Render form.
     $renderer = $PAGE->get_renderer('filter_opencast');
-    echo $renderer->render_player($endpoint, $params);
+    echo $renderer->render_lti_form($endpoint, $params);
 
     // Submit form.
     $PAGE->requires->js_call_amd('filter_opencast/form', 'init');
 }
 
-function filter_opencast_create_parameters() {
+function filter_opencast_create_parameters($endpoint) {
     global $CFG, $COURSE, $USER;
 
     // Get consumerkey and consumersecret.

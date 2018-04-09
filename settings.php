@@ -27,7 +27,11 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('filter_opencast/consumerkey',
         get_string('setting_consumerkey', 'filter_opencast'),
         get_string('setting_consumerkey_desc', 'filter_opencast'), ''));
-    $settings->add(new admin_setting_configtext('filter_opencast/consumersecret',
+    $settings->add(new admin_setting_configpasswordunmask('filter_opencast/consumersecret',
         get_string('setting_consumersecret', 'filter_opencast'),
         get_string('setting_consumersecret_desc', 'filter_opencast'), ''));
+    $settings->add(new admin_setting_configtext('filter_opencast/engageurl',
+        get_string('setting_engageurl', 'filter_opencast'),
+        get_string('setting_engageurl_desc', 'filter_opencast'), ''));
+
 }
