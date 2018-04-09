@@ -69,12 +69,8 @@ class filter_opencast extends moodle_text_filter {
                 } else if ($video) {
                     $video = false;
                     if (substr($match, 0, 7) === "<source") {
-                        // Get baseurl either from engageurl setting or from opencast tool.
+                        // Get baseurl
                         $baseurl = get_config('filter_opencast', 'engageurl');
-                        if (empty($baseurl)) {
-                            $baseurl = get_config('tool_opencast', 'apiurl');
-                        }
-
 
                         // Check if video is from opencast.
                         if (strpos($match, $baseurl) === false) {
