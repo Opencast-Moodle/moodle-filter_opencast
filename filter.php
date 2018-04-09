@@ -39,6 +39,8 @@ require_once($CFG->libdir . '/oauthlib.php');
  */
 class filter_opencast extends moodle_text_filter {
 
+    private static $loginrendered = false;
+
     public function filter($text, array $options = array()) {
         global $CFG, $PAGE;
 
@@ -55,10 +57,11 @@ class filter_opencast extends moodle_text_filter {
 
             // Login if user is not logged in yet.
             $loggedin = true;
-            if (!isset($_COOKIE['JSESSIONID'])) {
+            if (!isset($_COOKIE['JSESSIONID']) && !self::$loginrendered) {
                 // Login and set cookie.
                 filter_opencast_login();
                 $loggedin = false;
+                self::$loginrendered = true;
             }
 
             $video = false;
