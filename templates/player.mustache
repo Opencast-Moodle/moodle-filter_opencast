@@ -23,10 +23,10 @@
 
 {{! Print the iframe. }}
 {{# loggedin}}
-    <iframe src="{{src}}" width="95%" height="455px" class="ocplayer"></iframe>
+    <iframe src="{{src}}" width="95%" height="455px" class="ocplayer" allowfullscreen="true"></iframe>
 {{/ loggedin}}
 {{^loggedin}}
-    <iframe data-frameSrc="{{src}}" width="95%" height="455px" class="ocplayer"></iframe>
+    <iframe data-frameSrc="{{src}}" width="95%" height="455px" class="ocplayer" allowfullscreen="true"></iframe>
 {{/loggedin}}
 {{! Print the link to the video. }}
 <a style="display:block;" target="_blank" href="{{link}}">Zum Video</a>

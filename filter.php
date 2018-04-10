@@ -89,6 +89,7 @@ class filter_opencast extends moodle_text_filter {
 
                         // Create link to video.
                         $playerurl = get_config('filter_opencast', 'playerurl');
+                        // Change url for Paella Player
                         $link = $baseurl . $playerurl .'?id=' . $id. '&mode=embed';
 
                         // Create source with embedded mode
