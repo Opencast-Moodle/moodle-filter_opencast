@@ -33,5 +33,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('filter_opencast/engageurl',
         get_string('setting_engageurl', 'filter_opencast'),
         get_string('setting_engageurl_desc', 'filter_opencast'), ''));
-
+    $settings->add(new admin_setting_configtext('filter_opencast/playerurl',
+        get_string('setting_playerurl', 'filter_opencast'),
+        get_string('setting_playerurl_desc', 'filter_opencast'), ''));
 }

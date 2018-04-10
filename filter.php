@@ -40,7 +40,7 @@ require_once($CFG->libdir . '/oauthlib.php');
 class filter_opencast extends moodle_text_filter {
 
     public function filter($text, array $options = array()) {
-        global $CFG, $PAGE;
+        global $PAGE;
 
         if (stripos($text, '</video>') === false) {
             // Performance shortcut - if there are no </video> tags, nothing can match.
@@ -83,10 +83,13 @@ class filter_opencast extends moodle_text_filter {
 
                         // Extract id.
                         $id = substr($match, strpos($match, 'api/') + 4, 36);
-                        $src = $CFG->wwwroot . '/filter/opencast/player/core.html?id=' . $id . '&ocurl=' . urlencode($baseurl);
 
                         // Create link to video.
-                        $link = $baseurl . '/engage/theodul/ui/core.html?id=' . $id;
+                        $playerurl = get_config('filter_opencast', 'playerurl');
+                        $link = $baseurl . $playerurl .'?id=' . $id. '&mode=embed';
+
+                        // Create source with embedded mode
+                        $src = $link;
 
                         // Collect the needed data being submitted to the template.
                         $mustachedata = new stdClass();
