@@ -17,24 +17,23 @@
 /**
  *  Opencast filtering
  *
- *  This filter will replace any links to opencast videos with the opencast theodul pass player.
+ *  This filter will replace any links to opencast videos with the selected player from opencast.
  *
  * @package    filter
  * @subpackage opencast
- * @copyright  2017 Tamara Gunkel
+ * @copyright  2018 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/filter/opencast/lib.php');
-require_once($CFG->libdir . '/oauthlib.php');
 
 /**
  * Automatic opencast videos filter class.
  *
  * @package    filter
  * @subpackage opencast
- * @copyright  2017 Tamara Gunkel
+ * @copyright  2018 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter_opencast extends moodle_text_filter {
@@ -67,12 +66,13 @@ class filter_opencast extends moodle_text_filter {
             $video = false;
 
             foreach ($matches as $match) {
+            	// Check if the match is a video tag.
                 if (substr($match, 0, 6) === "<video") {
                     $video = true;
                 } else if ($video) {
                     $video = false;
                     if (substr($match, 0, 7) === "<source") {
-                        // Get baseurl
+                        // Get baseurl.
                         $baseurl = get_config('filter_opencast', 'engageurl');
 
                         // Check if video is from opencast.
@@ -89,10 +89,11 @@ class filter_opencast extends moodle_text_filter {
 
                         // Create link to video.
                         $playerurl = get_config('filter_opencast', 'playerurl');
-                        // Change url for Paella Player
-                        $link = $baseurl . $playerurl .'?id=' . $id. '&mode=embed';
 
-                        // Create source with embedded mode
+                        // Change url for loading the (Paella) Player.
+                        $link = $baseurl . $playerurl .'?id=' . $id;
+
+                        // Create source with embedded mode.
                         $src = $link;
 
                         // Collect the needed data being submitted to the template.
@@ -113,6 +114,4 @@ class filter_opencast extends moodle_text_filter {
         // Return the same string except processed by the above.
         return $text;
     }
-
-
 }

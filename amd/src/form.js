@@ -40,6 +40,7 @@ define(['jquery'], function($) {
                     data: $('#ltiLaunchForm').serialize(),
                     complete: function () {
                         $(".ocplayer").each(function () {
+                            // Replace the src url of the iframes to load the videos.
                             $(this).attr('src', $(this).data('framesrc'));
                         });
                     }

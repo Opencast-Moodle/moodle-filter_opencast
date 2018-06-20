@@ -18,7 +18,7 @@
  *
  * @package    filter
  * @subpackage opencast
- * @copyright  2017 Tamara Gunkel
+ * @copyright  2018 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/lib/oauthlib.php');
 function filter_opencast_login() {
     global $PAGE;
 
-    // Get url of opencast engage server
+    // Get url of opencast engage server.
     $endpoint = get_config('filter_opencast', 'engageurl');
     if (strpos($endpoint, 'http') !== 0) {
         $endpoint = 'http://' . $endpoint;
@@ -50,6 +50,12 @@ function filter_opencast_login() {
     $PAGE->requires->js_call_amd('filter_opencast/form', 'init');
 }
 
+/**
+ * Create necessary lti parameters.
+ * @param $endpoint of the opencast instance.
+ *
+ * @return array lti parameters
+ */
 function filter_opencast_create_parameters($endpoint) {
     global $CFG, $COURSE, $USER;
 
@@ -66,19 +72,13 @@ function filter_opencast_create_parameters($endpoint) {
     $params['oauth_nonce'] = $helper->get_nonce();
     $params['oauth_timestamp'] = $helper->get_timestamp();
     $params['oauth_consumer_key'] = $consumerkey;
-    $params['user_id'] = $USER->id;
-    $params['roles'] = lti_get_ims_role($USER, null, $COURSE->id, false);
+
     $params['context_id'] = $COURSE->id;
     $params['context_label'] = trim($COURSE->shortname);
     $params['context_title'] = trim($COURSE->fullname);
     $params['resource_link_id'] = 'o' . random_int(1000, 9999) . '-' . random_int(1000, 9999);
     $params['resource_link_title'] = 'Opencast';
     $params['context_type'] = ($COURSE->format == 'site') ? 'Group' : 'CourseSection';
-    $params['lis_person_name_given'] = $USER->firstname;
-    $params['lis_person_name_family'] = $USER->lastname;
-    $params['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
-    $params['ext_user_username'] = $USER->username;
-    $params['lis_person_contact_email_primary'] = $USER->email;
     $params['launch_presentation_locale'] = current_language();
     $params['ext_lms'] = 'moodle-2';
     $params['tool_consumer_info_product_family_code'] = 'moodle';
@@ -88,6 +88,15 @@ function filter_opencast_create_parameters($endpoint) {
     $params['lti_message_type'] = 'basic-lti-launch-request';
     $urlparts = parse_url($CFG->wwwroot);
     $params['tool_consumer_instance_guid'] = $urlparts['host'];
+
+    // User data.
+	$params['user_id'] = $USER->id;
+	$params['lis_person_name_given'] = $USER->firstname;
+	$params['lis_person_name_family'] = $USER->lastname;
+	$params['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
+	$params['ext_user_username'] = $USER->username;
+	$params['lis_person_contact_email_primary'] = $USER->email;
+	$params['roles'] = lti_get_ims_role($USER, null, $COURSE->id, false);
 
     if (!empty($CFG->mod_lti_institution_name)) {
         $params['tool_consumer_instance_name'] = trim(html_to_text($CFG->mod_lti_institution_name, 0));
