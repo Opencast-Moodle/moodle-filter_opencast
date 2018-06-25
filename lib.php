@@ -77,7 +77,6 @@ function filter_opencast_create_parameters($endpoint) {
 	$params['context_id'] = $COURSE->id;
 	$params['resource_link_id'] = 'o' . random_int(1000, 9999) . '-' . random_int(1000, 9999);
 	$params['context_type'] = ($COURSE->format == 'site') ? 'Group' : 'CourseSection';
-	$params['launch_presentation_locale'] = current_language();
 	$params['lti_version'] = 'LTI-1p0';
 	$params['lti_message_type'] = 'basic-lti-launch-request';
 	$urlparts = parse_url($CFG->wwwroot);
