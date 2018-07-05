@@ -32,8 +32,12 @@ require_once($CFG->dirroot . '/lib/oauthlib.php');
 function filter_opencast_login() {
     global $PAGE;
 
-    // Get url of opencast engage server.
+    // Get baseurl for the endpoint either from engageurl setting or from opencast tool.
     $endpoint = get_config('filter_opencast', 'engageurl');
+    if (empty($endpoint)) {
+        $endpoint = get_config('tool_opencast', 'apiurl');
+    }
+
     if (strpos($endpoint, 'http') !== 0) {
         $endpoint = 'http://' . $endpoint;
     }
