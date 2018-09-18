@@ -107,6 +107,13 @@ class filter_opencast extends moodle_text_filter {
                 $fragment = $dom->createDocumentFragment();
                 $fragment->appendXML($newtext);
 
+                // If video tag was inside VideoJS-Player, replace outer VideoJS div
+                // instead of just the inner video tag.
+                $grandparent = $video->parentNode->parentNode;
+                if ($grandparent && $grandparent->hasAttribute('class') && strpos($grandparent->getAttribute('class'), 'mediaplugin_videojs') !== false) {
+                    $video = $grandparent;
+                }
+
                 // Replace video tag.
                 $video->parentNode->replaceChild($fragment, $video);
                 break;
