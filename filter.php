@@ -50,6 +50,9 @@ class filter_opencast extends moodle_text_filter {
             return $text;
         }
 
+        // Temporarily convert to ISO-8859-1 to make DOM classes handle non-ASCII characters.
+        $text = mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8');
+
         $renderer = $PAGE->get_renderer('filter_opencast');
 
         // Login if user is not logged in yet.
@@ -121,6 +124,8 @@ class filter_opencast extends moodle_text_filter {
         }
 
         // Return the same string except processed by the above.
-        return $dom->saveHTML();
+        $text = $dom->saveHTML();
+        $text = mb_convert_encoding($text, 'UTF-8', 'ISO-8859-1');
+        return $text;
     }
 }
