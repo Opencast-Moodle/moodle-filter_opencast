@@ -109,7 +109,7 @@ class filter_opencast extends moodle_text_filter {
                         $newtext =  $renderer->render_player($mustachedata);
 
                         // Replace video tag.
-                        $text = preg_replace('/<video.*<\/video>/', $newtext, $text, 1);
+                        $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/', $newtext, $text, 1);
                     }
                 }
             }
