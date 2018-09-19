@@ -56,7 +56,7 @@ class filter_opencast extends moodle_text_filter {
 
             // Login if user is not logged in yet.
             $loggedin = true;
-            if (!isset($_COOKIE['JSESSIONID']) && !self::$loginrendered) {
+            if (!self::$loginrendered) {
                 // Login and set cookie.
                 filter_opencast_login();
                 $loggedin = false;
