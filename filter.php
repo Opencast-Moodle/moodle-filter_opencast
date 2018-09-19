@@ -84,18 +84,15 @@ class filter_opencast extends moodle_text_filter {
                             continue;
                         }
 
-                        if (strpos($baseurl, 'http') !== 0) {
-                            $baseurl = 'http://' . $baseurl;
-                        }
-
-                        // Extract id.
-                        $id = substr($match, strpos($match, 'api/') + 4, 36);
-
-                        // Create link to video.
-                        $playerurl = get_config('filter_opencast', 'playerurl');
+                        // Extract url.
+                        preg_match_all('/<source[^>]+src=([\'"])(?<src>.+?)\1[^>]*>/i', $match, $result);
 
                         // Change url for loading the (Paella) Player.
-                        $link = $baseurl . $playerurl .'?id=' . $id;
+                        $link = $result['src'][0];
+
+                        if (strpos($link, 'http') !== 0) {
+                            $link = 'http://' . $link;
+                        }
 
                         // Create source with embedded mode.
                         $src = $link;
