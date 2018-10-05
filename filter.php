@@ -49,7 +49,7 @@ class filter_opencast extends moodle_text_filter {
             $baseurl = get_config('tool_opencast', 'apiurl');
         }
 
-        if (stripos($text, '</video>') === false) {
+        if (stripos($text, $baseurl) === false) {
             // Performance shortcut - if there are no </video> tags, nothing can match.
             return $text;
         }
