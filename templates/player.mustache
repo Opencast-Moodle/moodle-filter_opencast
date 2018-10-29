@@ -21,14 +21,11 @@
   The purpose of this template is to render a opencast video.
 }}
 
-{{! Print the iframe. }}
-{{# loggedin}}
-    <iframe src="{{src}}" width="95%" height="455px" class="ocplayer" allowfullscreen="true"></iframe>
-{{/ loggedin}}
-{{^loggedin}}
-{{! Don't load the video yet if not logged in. }}
-    <iframe data-frameSrc="{{src}}" width="95%" height="455px" class="ocplayer" allowfullscreen="true"></iframe>
-{{/loggedin}}
+{{!
+    Print the iframe.
+    Don't load the video yet, because we have to assume the user is not logged in yet.
+}}
+<iframe data-frameSrc="{{src}}" width="95%" height="455px" class="ocplayer" allowfullscreen="true"></iframe>
 {{! Print the link to the video. }}
 <a style="display:block;" target="_blank" href="{{link}}">Zum Video</a>
 

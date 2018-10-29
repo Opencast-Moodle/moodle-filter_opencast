@@ -61,11 +61,9 @@ class filter_opencast extends moodle_text_filter {
             $renderer = $PAGE->get_renderer('filter_opencast');
 
             // Login if user is not logged in yet.
-            $loggedin = true;
             if (!self::$loginrendered) {
                 // Login and set cookie.
                 filter_opencast_login();
-                $loggedin = false;
                 self::$loginrendered = true;
             }
 
@@ -99,7 +97,6 @@ class filter_opencast extends moodle_text_filter {
 
                         // Collect the needed data being submitted to the template.
                         $mustachedata = new stdClass();
-                        $mustachedata->loggedin = $loggedin;
                         $mustachedata->src = $src;
                         $mustachedata->link = $link;
 
