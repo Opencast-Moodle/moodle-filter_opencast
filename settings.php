@@ -28,14 +28,31 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('filter_opencast/consumerkey',
         get_string('setting_consumerkey', 'filter_opencast'),
         get_string('setting_consumerkey_desc', 'filter_opencast'), ''));
+    
     $settings->add(new admin_setting_configpasswordunmask('filter_opencast/consumersecret',
         get_string('setting_consumersecret', 'filter_opencast'),
         get_string('setting_consumersecret_desc', 'filter_opencast'), ''));
+    
     // Opencast settings.
     $settings->add(new admin_setting_configtext('filter_opencast/engageurl',
         get_string('setting_engageurl', 'filter_opencast'),
         get_string('setting_engageurl_desc', 'filter_opencast'), ''));
+    
     $settings->add(new admin_setting_configtext('filter_opencast/playerurl',
         get_string('setting_playerurl', 'filter_opencast'),
         get_string('setting_playerurl_desc', 'filter_opencast'), ''));
+    
+    $options = array('' => get_string('no'), 'allowfullscreen' => get_string('yes'));
+    $settings->add(new admin_setting_configselect('filter_opencast/allowfullscreen',
+    	get_string('setting_allowfullscreen', 'filter_opencast'),
+    	get_string('setting_allowfullscreen_desc', 'filter_opencast'),
+    	'allowfullscreen', $options));
+    
+    $settings->add(new admin_setting_configtext('filter_opencast/defaultwidth',
+    	get_string('setting_defaultwidth', 'filter_opencast'),
+    	get_string('setting_defaultwidth_desc', 'filter_opencast'), '95%'));
+    
+    $settings->add(new admin_setting_configtext('filter_opencast/defaultheight',
+    	get_string('setting_defaultheight', 'filter_opencast'),
+    	get_string('setting_defaultheight_desc', 'filter_opencast'), '455px'));
 }

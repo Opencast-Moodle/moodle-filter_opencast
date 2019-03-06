@@ -75,6 +75,17 @@ class filter_opencast extends moodle_text_filter {
             	// Check if the match is a video tag.
                 if (substr($match, 0, 6) === "<video") {
                     $video = true;
+                    
+                    //get width and height
+                    $iswidth = preg_match('/width=\"(\d*.?.?)\"/', $match, $width);
+                    $isheight = preg_match('/height=\"(\d*.?.?)\"/', $match, $height);
+                    
+                    //get autoplay
+                    $autoplay = '';
+                    if(strpos($match, 'autoplay')){
+                    	$autoplay = '&autoplay=true';
+                    }
+                    
                 } else if ($video) {
                     $video = false;
                     if (substr($match, 0, 7) === "<source") {
@@ -95,13 +106,32 @@ class filter_opencast extends moodle_text_filter {
                         }
 
                         // Create source with embedded mode.
-                        $src = $link;
+                        $src = $link . $autoplay;
 
                         // Collect the needed data being submitted to the template.
                         $mustachedata = new stdClass();
                         $mustachedata->loggedin = $loggedin;
                         $mustachedata->src = $src;
                         $mustachedata->link = $link;
+                        $mustachedata->allowfullscreen = get_config('filter_opencast', 'allowfullscreen');
+                        
+                        $prewidth  = "width=";
+                        $preheight = "height=";
+                        
+                        //no custom width or height set in video-tag
+                        if(!$iswidth && !$isheight){
+                        	$mustachedata->width = $prewidth.get_config('filter_opencast', 'defaultwidth');
+                        	$mustachedata->height = $preheight.get_config('filter_opencast', 'defaultheight');
+                        } else {
+                        	
+                        	if (!empty($width[1])) {
+                        		$mustachedata->width = $prewidth.$width[1];
+                        	}
+                        	
+                        	if (!empty($height[1])) {
+                        		$mustachedata->height = $preheight.$height[1];
+                        	}
+                        }
 
                         $newtext =  $renderer->render_player($mustachedata);
 
