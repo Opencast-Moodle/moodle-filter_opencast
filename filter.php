@@ -43,7 +43,13 @@ class filter_opencast extends moodle_text_filter {
     public function filter($text, array $options = array()) {
         global $PAGE;
 
-        if (stripos($text, '</video>') === false) {
+        // Get baseurl either from engageurl setting or from opencast tool.
+        $baseurl = get_config('filter_opencast', 'engageurl');
+        if (empty($baseurl)) {
+            $baseurl = get_config('tool_opencast', 'apiurl');
+        }
+
+        if (stripos($text, $baseurl) === false) {
             // Performance shortcut - if there are no </video> tags, nothing can match.
             return $text;
         }
@@ -56,7 +62,7 @@ class filter_opencast extends moodle_text_filter {
 
             // Login if user is not logged in yet.
             $loggedin = true;
-            if (!isset($_COOKIE['JSESSIONID']) && !self::$loginrendered) {
+            if (!self::$loginrendered) {
                 // Login and set cookie.
                 filter_opencast_login();
                 $loggedin = false;
@@ -73,29 +79,20 @@ class filter_opencast extends moodle_text_filter {
                     $video = false;
                     if (substr($match, 0, 7) === "<source") {
 
-                        // Get baseurl either from engageurl setting or from opencast tool.
-                        $baseurl = get_config('filter_opencast', 'engageurl');
-                        if (empty($baseurl)) {
-                            $baseurl = get_config('tool_opencast', 'apiurl');
-                        }
-
                         // Check if video is from opencast.
                         if (strpos($match, $baseurl) === false) {
                             continue;
                         }
 
-                        if (strpos($baseurl, 'http') !== 0) {
-                            $baseurl = 'http://' . $baseurl;
-                        }
-
-                        // Extract id.
-                        $id = substr($match, strpos($match, 'api/') + 4, 36);
-
-                        // Create link to video.
-                        $playerurl = get_config('filter_opencast', 'playerurl');
+                        // Extract url.
+                        preg_match_all('/<source[^>]+src=([\'"])(?<src>.+?)\1[^>]*>/i', $match, $result);
 
                         // Change url for loading the (Paella) Player.
-                        $link = $baseurl . $playerurl .'?id=' . $id;
+                        $link = $result['src'][0];
+
+                        if (strpos($link, 'http') !== 0) {
+                            $link = 'http://' . $link;
+                        }
 
                         // Create source with embedded mode.
                         $src = $link;
@@ -109,7 +106,7 @@ class filter_opencast extends moodle_text_filter {
                         $newtext =  $renderer->render_player($mustachedata);
 
                         // Replace video tag.
-                        $text = preg_replace('/<video.*<\/video>/', $newtext, $text, 1);
+                        $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/', $newtext, $text, 1);
                     }
                 }
             }

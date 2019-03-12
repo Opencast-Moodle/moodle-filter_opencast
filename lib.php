@@ -92,6 +92,7 @@ function filter_opencast_create_parameters($endpoint) {
     $params['lti_message_type'] = 'basic-lti-launch-request';
     $urlparts = parse_url($CFG->wwwroot);
     $params['tool_consumer_instance_guid'] = $urlparts['host'];
+    $params['custom_tool'] = '/ltitools';
 
     // User data.
 	$params['user_id'] = $USER->id;
