@@ -48,10 +48,12 @@ function filter_opencast_login() {
 
     // Render form.
     $renderer = $PAGE->get_renderer('filter_opencast');
-    echo $renderer->render_lti_form($endpoint, $params);
+    $html = $renderer->render_lti_form($endpoint, $params);
 
     // Submit form.
     $PAGE->requires->js_call_amd('filter_opencast/form', 'init');
+
+    return $html;
 }
 
 /**
