@@ -1,6 +1,6 @@
 # moodle-filter_opencastfilter
 
-The opencast filter can be used to embed opencast videos using opencast players such as Paella or Theodul.
+The opencast filter can be used to embed opencast videos. Tested opencast players are Paella or Theodul. If you find other players, please contact us to enhance the list.
 The filter takes in the html pasted by the opencast repository and replaces it by an iframe, which serves an opencast player with the respective opencast event.
 The filter itself has no influence on the embedded content, but simply takes the information created by the repository.
 Look into the documentation of [repository_opencast](https://github.com/unirz-tu-ilmenau/moodle-repository_opencast) for details on that.
