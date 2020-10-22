@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-	// Lti settings.
+    // Lti settings.
     $settings->add(new admin_setting_configtext('filter_opencast/consumerkey',
         get_string('setting_consumerkey', 'filter_opencast'),
         get_string('setting_consumerkey_desc', 'filter_opencast'), ''));

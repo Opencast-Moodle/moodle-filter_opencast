@@ -95,13 +95,13 @@ function filter_opencast_create_parameters($endpoint) {
     $params['custom_tool'] = '/ltitools';
 
     // User data.
-	$params['user_id'] = $USER->id;
-	$params['lis_person_name_given'] = $USER->firstname;
-	$params['lis_person_name_family'] = $USER->lastname;
-	$params['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
-	$params['ext_user_username'] = $USER->username;
-	$params['lis_person_contact_email_primary'] = $USER->email;
-	$params['roles'] = lti_get_ims_role($USER, null, $COURSE->id, false);
+    $params['user_id'] = $USER->id;
+    $params['lis_person_name_given'] = $USER->firstname;
+    $params['lis_person_name_family'] = $USER->lastname;
+    $params['lis_person_name_full'] = $USER->firstname . ' ' . $USER->lastname;
+    $params['ext_user_username'] = $USER->username;
+    $params['lis_person_contact_email_primary'] = $USER->email;
+    $params['roles'] = lti_get_ims_role($USER, null, $COURSE->id, false);
 
     if (!empty($CFG->mod_lti_institution_name)) {
         $params['tool_consumer_instance_name'] = trim(html_to_text($CFG->mod_lti_institution_name, 0));

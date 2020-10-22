@@ -72,7 +72,7 @@ class filter_opencast extends moodle_text_filter {
             $video = false;
 
             foreach ($matches as $match) {
-            	// Check if the match is a video tag.
+                // Check if the match is a video tag.
                 if (substr($match, 0, 6) === "<video") {
                     $video = true;
                 } else if ($video) {
@@ -103,10 +103,11 @@ class filter_opencast extends moodle_text_filter {
                         $mustachedata->src = $src;
                         $mustachedata->link = $link;
 
-                        $newtext =  $renderer->render_player($mustachedata);
+                        $newtext = $renderer->render_player($mustachedata);
 
                         // Replace video tag.
-                        $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/', $newtext, $text, 1);
+                        $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') .
+                            '.*?<\/video>/', $newtext, $text, 1);
                     }
                 }
             }
