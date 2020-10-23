@@ -19,6 +19,17 @@
 
   Opencast player template.
   The purpose of this template is to render a opencast video.
+  Context variables required for this template:
+  * src - source of video
+  * link - link to video
+  * width - adds % sign
+
+  Example context (json):
+  {
+      "src": "https://electures.uni-muenster.de/paella/ui/watch.html?id=anicuhsc-naco-sac43-29384",
+      "link": "https://electures.uni-muenster.de/paella/ui/watch.html?id=anicuhsc-naco-sac43-29384",
+      "width":"%"
+   }
 }}
 
 {{! Print the iframe. }}
