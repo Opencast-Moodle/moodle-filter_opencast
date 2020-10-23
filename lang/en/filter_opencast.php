@@ -17,7 +17,7 @@
 /**
  * Strings for component 'filter_opencastfilter', language 'en'
  *
- * @package   filter_opencastfilter
+ * @package   filter_opencast
  * @copyright 2017 Tamara Gunkel
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

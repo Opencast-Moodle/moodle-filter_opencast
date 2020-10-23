@@ -19,7 +19,7 @@
  *
  *  This filter will replace any links to opencast videos with the selected player from opencast.
  *
- * @package    filter
+ * @package    filter_opencast
  * @subpackage opencast
  * @copyright  2018 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,15 +31,23 @@ require_once($CFG->dirroot . '/filter/opencast/lib.php');
 /**
  * Automatic opencast videos filter class.
  *
- * @package    filter
+ * @package    filter_opencast
  * @subpackage opencast
  * @copyright  2018 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter_opencast extends moodle_text_filter {
 
+    /** @var bool is the login rendered? */
     private static $loginrendered = false;
 
+    /**
+     * Filter the given input.
+     * @param string $text
+     * @param array $options
+     * @return string|string[]|null
+     * @throws dml_exception
+     */
     public function filter($text, array $options = array()) {
         global $PAGE;
 

@@ -49,7 +49,8 @@ class filter_opencast_renderer extends plugin_renderer_base {
     /**
      * Display the lti form.
      *
-     * @param object $data The prepared variables.
+     * @param string $endpoint the opencast endpoint.
+     * @param array $params parameter to be passed.
      * @return string
      */
     public function render_lti_form($endpoint, $params) {

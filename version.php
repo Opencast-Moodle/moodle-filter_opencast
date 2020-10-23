@@ -17,7 +17,7 @@
 /**
  * Opencast filter
  *
- * @package    filter
+ * @package    filter_opencast
  * @subpackage opencastfilter
  * @copyright  2018 Tamara Gunkel, 2020 Nina Herrmann
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
