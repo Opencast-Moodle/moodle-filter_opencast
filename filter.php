@@ -101,15 +101,14 @@ class filter_opencast extends moodle_text_filter {
                         if (strpos($link, 'http') !== 0) {
                             $link = 'http://' . $link;
                         }
-
                         // Create source with embedded mode.
                         $src = $link;
-
                         // Collect the needed data being submitted to the template.
                         $mustachedata = new stdClass();
                         $mustachedata->loggedin = $loggedin;
                         $mustachedata->src = $src;
                         $mustachedata->link = $link;
+                        $mustachedata->width = '95%';
 
                         $newtext = $renderer->render_player($mustachedata);
 
