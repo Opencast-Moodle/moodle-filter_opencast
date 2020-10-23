@@ -108,7 +108,7 @@ class filter_opencast extends moodle_text_filter {
                         $mustachedata->loggedin = $loggedin;
                         $mustachedata->src = $src;
                         $mustachedata->link = $link;
-                        $mustachedata->width = '95%';
+                        $mustachedata->width = '%';
 
                         $newtext = $renderer->render_player($mustachedata);
 
