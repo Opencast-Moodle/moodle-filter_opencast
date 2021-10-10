@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_opencast\local\paella_transform;
+use filter_opencast\local\paella_transform;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/filter/opencast/lib.php');
@@ -39,8 +39,6 @@ require_once($CFG->dirroot . '/filter/opencast/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter_opencast extends moodle_text_filter {
-
-    private static $loginrendered = false;
 
     public function filter($text, array $options = array()) {
         global $PAGE;

@@ -31,5 +31,4 @@ $plugin->requires = 2017050500;        // Requires this Moodle version.
 $plugin->component = 'filter_opencast'; // Full name of the plugin.
 $plugin->dependencies = array(
     'tool_opencast' => 2018102900,
-    'mod_opencast' => 2021091200
 );
