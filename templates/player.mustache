@@ -19,16 +19,42 @@
 
   Opencast player template.
   The purpose of this template is to render a opencast video.
+
+  Example context (json):
+  {
+      "resolution": "500/300",
+      "width": "400",
+      "height": "250",
+      "playerid": "ocplayer_0",
+      "configurl": "/mod/opencast/config.json",
+      "data": "{\"metadata\":{\"title\": \"Test video\", \"etc\": \"...\"}"
+  }
 }}
 
-{{! Print the iframe. }}
-{{# loggedin}}
-    <iframe src="{{src}}" width="95%" height="455px" class="ocplayer" allowfullscreen="true"></iframe>
-{{/ loggedin}}
-{{^loggedin}}
-{{! Don't load the video yet if not logged in. }}
-    <iframe data-frameSrc="{{src}}" width="95%" height="455px" class="ocplayer" allowfullscreen="true"></iframe>
-{{/loggedin}}
-{{! Print the link to the video. }}
-<a style="display:block;" target="_blank" href="{{link}}">{{#str}} to_the_video, filter_opencast {{/str}}</a>
+{{#resolution}}
+<div class="{{^width}}filter-opencast{{/width}} player-wrapper" style="--aspect-ratio: {{resolution}}; {{#width}}width: {{width}}px; height: {{height}}px{{/width}}">
+{{/resolution}}
+{{^resolution}}
+<div class="filter-opencast player-wrapper">
+{{/resolution}}
+    <iframe src="/filter/opencast/player.html" class="filter-player-iframe" id="{{playerid}}" allowfullscreen"></iframe>
+</div>
+
+<script>
+function init_{{playerid}}() {
+    const iframeWindow = document.getElementById('{{playerid}}').contentWindow;
+    if (!iframeWindow.paella || !iframeWindow.paella.lazyLoad) {
+        setTimeout(init_{{playerid}}, 20, '{{playerid}}', '{{configurl}}');
+    }
+    else {
+        iframeWindow.paella.lazyLoad('playerContainer', {
+            configUrl: '{{configurl}}',
+            data: '{{&data}}'
+        });
+    }
+}
+
+init_{{playerid}}();
+
+</script>
 

@@ -32,4 +32,5 @@ $plugin->component = 'filter_opencast'; // Full name of the plugin.
 $plugin->dependencies = array(
     'block_opencast' => 2019052900, // Requires Block Opencast and Tool Opencast
     'tool_opencast' => 2018102900,
+    'mod_opencast' => 2021091200
 );
