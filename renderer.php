@@ -24,7 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/lib.php');
 require_once($CFG->libdir . '/weblib.php');
 
 /**

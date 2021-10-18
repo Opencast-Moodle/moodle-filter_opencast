@@ -25,10 +25,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use filter_opencast\local\paella_transform;
+
+use mod_opencast\local\paella_transform; // TODO check why this doent work with filter
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot . '/filter/opencast/lib.php');
+
+// TODO update renderer -> check if this is done like that
 
 /**
  * Automatic opencast videos filter class.
@@ -45,16 +47,14 @@ class filter_opencast extends moodle_text_filter {
         $i = 0;
 
         foreach(\tool_opencast\local\settings_api::get_ocinstances() as $ocinstance) {
-            // Get baseurl either from opencast tool.
-            // TODO also use engage url or repository url.
-            $baseurl = \tool_opencast\local\settings_api::get_apiurl($ocinstance->id); // TODO is this always the same url as the playerurl used in the repository?!
-
-            if($ocinstance->id == 2) {
-                $baseurl = 'https://electures.uni-muenster.de'; // TODO delete
+            $episodeurl = get_config('filter_opencast','episodeurl_' . $ocinstance->id);
+            $urlparts = parse_url($episodeurl);
+            $baseurl = $urlparts['scheme'] . '://' . $urlparts['host'];
+            if($urlparts['port']) {
+                $baseurl .= $urlparts['port'];
             }
 
-
-            if (stripos($text, $baseurl) === false) {
+            if (empty($episodeurl) || stripos($text, $baseurl) === false) {
                 // Performance shortcut - if there are no </video> tags, nothing can match.
                 continue;
             }
@@ -81,10 +81,9 @@ class filter_opencast extends moodle_text_filter {
 
                             // Check if video is from opencast.
                             if (strpos($match, $baseurl) === false) {
+                                $width = $height = false;
                                 continue;
                             }
-
-                            // TODO use api to check if video is available.
 
                             // Extract url.
                             preg_match_all('/<source[^>]+src=([\'"])(?<src>.+?)\1[^>]*>/i', $match, $result);
@@ -93,26 +92,21 @@ class filter_opencast extends moodle_text_filter {
                             $link = $result['src'][0];
 
                             // Get episode id from link
-                            // TODO matthias fragen, ob die ids immer so aufgebaut sind
-                            preg_match_all('/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/', $link, $episodeid);
+                            $episoderegex = "/" . preg_quote($episodeurl, "/") . "/";
+                            $episoderegex = preg_replace('/\\\\\[EPISODEID\\\]/','([0-9a-zA-Z\-]+)', $episoderegex);
+                            $nummatches = preg_match_all($episoderegex, $link, $episodeid);
 
-                            # todo handle id not not found
-
-                            $data = paella_transform::get_paella_data_json($ocinstance->id, $episodeid[0][0]);
-
-                            if (strpos($link, 'http') !== 0) {
-                                $link = 'http://' . $link;
+                            if(!$nummatches) {
+                                $width = $height = false;
+                                continue;
                             }
 
-                            // Create source with embedded mode.
-                            $src = $link;
+                            $data = paella_transform::get_paella_data_json($ocinstance->id, $episodeid[1][0]);
 
                             // Collect the needed data being submitted to the template.
                             $mustachedata = new stdClass();
-                            $mustachedata->src = $src;
-                            $mustachedata->link = $link;
                             $mustachedata->playerid = 'ocplayer_' . $i++;
-                            $mustachedata->configurl = '/mod/opencast/config.json';
+                            $mustachedata->configurl = get_config('filter_opencast','configurl_' . $ocinstance->id);
                             $mustachedata->data = json_encode($data);
                             $mustachedata->width = $width;
                             $mustachedata->height = $height;

@@ -25,8 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 $string['filtername'] = 'Opencast';
 $string['pluginname'] = 'Opencast Filter';
-$string['setting_engageurl'] = 'URL of the Opencast Engage server';
-$string['setting_engageurl_desc'] = 'If empty, the base URL of the admin tool is used.';
-$string['setting_playerurl'] = 'URL of the Opencast player';
-$string['setting_playerurl_desc'] = 'Relative URL of the Opencast player, e.g. /engage/theodul/ui/core.html for the Theodul Pass Player.';
-$string['to_the_video'] = 'Watch the video';
+$string['setting_episodeurl'] = 'URL template for filtering';
+$string['setting_episodeurl_desc'] = 'URLs matching this template are replaced with the Opencast player. You must use the placeholder [EPISODEID] to indicate where the episode ID is contained in the URL e.g. http://stable.opencast.de/play/[EPISODEID]';
+$string['setting_configurl'] = 'URL to Paella config.json';
+$string['setting_configurl_desc'] = 'URL of the config.json used by Paella Player. Can either be a absolute URL or a URL relative to the wwwroot.';

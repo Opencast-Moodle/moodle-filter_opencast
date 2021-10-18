@@ -24,12 +24,15 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-    // Opencast settings.
-    // TODO delete this setting and use channel instead
-    $settings->add(new admin_setting_configtext('filter_opencast/engageurl',
-        get_string('setting_engageurl', 'filter_opencast'),
-        get_string('setting_engageurl_desc', 'filter_opencast'), ''));
-    $settings->add(new admin_setting_configtext('filter_opencast/playerurl',
-        get_string('setting_playerurl', 'filter_opencast'),
-        get_string('setting_playerurl_desc', 'filter_opencast'), ''));
+    $ocinstances = \tool_opencast\local\settings_api::get_ocinstances();
+
+    foreach ($ocinstances as $instance) {
+        $settings->add(new admin_setting_configtext('filter_opencast/episodeurl_' . $instance->id,
+            get_string('setting_episodeurl', 'filter_opencast'),
+            get_string('setting_episodeurl_desc', 'filter_opencast'), ''));
+
+        $settings->add(new admin_setting_configtext('filter_opencast/configurl_' . $instance->id,
+            new lang_string('setting_configurl', 'filter_opencast'),
+            new lang_string('setting_configurl_desc', 'filter_opencast'), '/filter/opencast/config.json'));
+    }
 }
