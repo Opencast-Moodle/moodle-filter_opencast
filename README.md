@@ -5,7 +5,9 @@ The filter takes in the html pasted by the opencast repository and replaces it b
 The filter itself has no influence on the embedded content, but simply takes the information created by the repository.
 Look into the documentation of [repository_opencast](https://github.com/Opencast-Moodle/moodle-repository_opencast) for details on that.
 
-##Requirements
+<img width="800" alt="Filter opencast demonstration" src="https://user-images.githubusercontent.com/28386141/137904963-968fd449-602d-40c8-99ad-c56a40fd03f0.png">
+
+## Requirements
 
 - [tool_opencast](https://github.com/Opencast-Moodle/moodle-tool_opencast)
 - [mod_opencast](https://github.com/Opencast-Moodle/moodle-mod_opencast)
@@ -14,6 +16,8 @@ Look into the documentation of [repository_opencast](https://github.com/Opencast
 
 ## Configuration
 The filter has two global configurations that can be modified by the administrator.
+
+<img width="800" alt="Filter opencast configuration" src="https://user-images.githubusercontent.com/28386141/137904968-cacaf48f-35c0-4d15-b6d7-001ded49afc9.png">
 
 The first configuration "URL template for filtering" specifies the URL type that is replaced by the filter. This URL should correspond to the URLs inserted by the repository plugin. In the config, you must use the placeholder [EPISODEID] to indicate where the episode id is contained in the link, e.g. `http://stable.opencast.de/play/[EPISODEID]`.
 
