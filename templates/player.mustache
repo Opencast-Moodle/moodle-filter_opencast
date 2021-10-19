@@ -26,8 +26,8 @@
       "width": "400",
       "height": "250",
       "playerid": "ocplayer_0",
-      "configurl": "/mod/opencast/config.json",
-      "data": "{\"metadata\":{\"title\": \"Test video\", \"etc\": \"...\"}"
+      "configurl": "/filter/opencast/config.json",
+      "data": "{&quot;metadata&quot;:{&quot;title&quot;: &quot;Test video&quot;, &quot;etc&quot;: &quot;...&quot;}"
   }
 }}
 
@@ -37,7 +37,7 @@
 {{^resolution}}
 <div class="filter-opencast player-wrapper">
 {{/resolution}}
-    <iframe src="/filter/opencast/player.html" class="filter-player-iframe" id="{{playerid}}" allowfullscreen"></iframe>
+    <iframe src="/mod/opencast/player.html" class="filter-player-iframe" id="{{playerid}}" allowfullscreen"></iframe>
 </div>
 
 <script>
@@ -49,7 +49,7 @@ function init_{{playerid}}() {
     else {
         iframeWindow.paella.lazyLoad('playerContainer', {
             configUrl: '{{configurl}}',
-            data: '{{&data}}'
+            data: JSON.parse('{{data}}'.replaceAll('&quot;', '"'))
         });
     }
 }

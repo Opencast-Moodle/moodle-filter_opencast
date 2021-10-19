@@ -26,11 +26,9 @@
  */
 
 
-use mod_opencast\local\paella_transform; // TODO check why this doent work with filter
+use mod_opencast\local\paella_transform;
 
 defined('MOODLE_INTERNAL') || die();
-
-// TODO update renderer -> check if this is done like that
 
 /**
  * Automatic opencast videos filter class.
@@ -46,6 +44,11 @@ class filter_opencast extends moodle_text_filter {
         global $PAGE;
         $i = 0;
 
+        if (stripos($text, '</video>') === false) {
+            // Performance shortcut - if there is no </video> tag, nothing can match.
+            return $text;
+        }
+
         foreach(\tool_opencast\local\settings_api::get_ocinstances() as $ocinstance) {
             $episodeurl = get_config('filter_opencast','episodeurl_' . $ocinstance->id);
             $urlparts = parse_url($episodeurl);
@@ -55,7 +58,6 @@ class filter_opencast extends moodle_text_filter {
             }
 
             if (empty($episodeurl) || stripos($text, $baseurl) === false) {
-                // Performance shortcut - if there are no </video> tags, nothing can match.
                 continue;
             }
 
@@ -134,7 +136,6 @@ class filter_opencast extends moodle_text_filter {
                             }
 
                             $newtext =  $renderer->render_player($mustachedata);
-                            // TODO xss possible?!
 
                             // Replace video tag.
                             $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/', $newtext, $text, 1);
