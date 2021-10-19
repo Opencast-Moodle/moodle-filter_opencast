@@ -1,31 +1,36 @@
-# moodle-filter_opencastfilter
-
-The opencast filter can be used to embed opencast videos. Tested opencast players are Paella or Theodul. If you find other players, please contact us to enhance the list.
-The filter takes in the html pasted by the opencast repository and replaces it by an iframe, which serves an opencast player with the respective opencast event.
+moodle-filter_opencast
+=====================
+The opencast filter can be used to embed opencast videos.
+The filter takes in the html pasted by the opencast repository and replaces it by an iframe, which loads the  <a href="https://github.com/polimediaupv/paella">Paella player</a> with the respective opencast event.
 The filter itself has no influence on the embedded content, but simply takes the information created by the repository.
-Look into the documentation of [repository_opencast](https://github.com/unirz-tu-ilmenau/moodle-repository_opencast) for details on that.
+Look into the documentation of [repository_opencast](https://github.com/Opencast-Moodle/moodle-repository_opencast) for details on that.
 
-**Requirements**
+##Requirements
 
-- [tool_opencast](https://github.com/unirz-tu-ilmenau/moodle-tool_opencast)
-- [repository_opencast](https://github.com/unirz-tu-ilmenau/moodle-repository_opencast)
+- [tool_opencast](https://github.com/Opencast-Moodle/moodle-tool_opencast)
+- [mod_opencast](https://github.com/Opencast-Moodle/moodle-mod_opencast)
+- [repository_opencast](https://github.com/Opencast-Moodle/moodle-repository_opencast): The filter can be installed without the repository 
+  but it is necessary to enable teachers to insert opencast videos.
 
-**Configuration**
+## Configuration
+The filter has two global configurations that can be modified by the administrator.
 
-In order for the opencast players to work, they need to call multiple API endpoints, which requires an authenticated user.
-The authentication is done using LTI. 
-For this, the opencast installation has to be prepared for connecting an LMS via LTI.
-You can find a documentation on that [here](https://docs.opencast.org/develop/admin/modules/ltimodule/). 
-The Client ID and Client Secret of your opencast installation have to be set in the configuration of the filter.
-Additionally, an alternative engage url can be set.
-The engage url points to the server, against which the LTI authentication is performed.
-In basic settings, this server is equivalent with the administration server, which is set in [tool_opencast](https://github.com/unirz-tu-ilmenau/moodle-tool_opencast).
-For more advanced installations, you can separate engage and admin server and provide the engage server url here.
+The first configuration "URL template for filtering" specifies the URL type that is replaced by the filter. This URL should correspond to the URLs inserted by the repository plugin. In the config, you must use the placeholder [EPISODEID] to indicate where the episode id is contained in the link, e.g. `http://stable.opencast.de/play/[EPISODEID]`.
 
-**Authentication**
+The second configuration "URL to Paella config.json" specifies the path to the Paella player config. This config can be adapted if you want to modify the look or behavior of the Paella player.
 
-In addition to the created iframe showing the opencast player,
-the filter also create an LTI form in the background, which is prefilled with the users data,
-and sends it. This way it creates a session for the user within the opencast system and enables the embedded video player to render properly.
-The LTI connection also guarantees that only users, which meet the requirements set by the ACL rules will be able to view the respective video.
-However, the links to the raw media files might still be extractable from the player code, which are unprotected and sharable among unauthorized users.
+## License ##
+
+This plugin is developed in cooperation with the WWU Münster.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
