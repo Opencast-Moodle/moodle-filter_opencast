@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 $string['filtername'] = 'Opencast';
 $string['pluginname'] = 'Opencast Filter';
+$string['privacy:metadata'] = 'The Opencast filter plugin does not store any personal data.';
 $string['setting_episodeurl'] = 'URL template for filtering';
 $string['setting_episodeurl_desc'] = 'URLs matching this template are replaced with the Opencast player. You must use the placeholder [EPISODEID] to indicate where the episode ID is contained in the URL e.g. http://stable.opencast.de/play/[EPISODEID]';
 $string['setting_configurl'] = 'URL to Paella config.json';
