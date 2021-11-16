@@ -57,9 +57,13 @@ class filter_opencast extends moodle_text_filter
 
         foreach (\tool_opencast\local\settings_api::get_ocinstances() as $ocinstance) {
             $episodeurl = get_config('filter_opencast', 'episodeurl_' . $ocinstance->id);
+            if(!$episodeurl) {
+                continue;
+            }
+
             $urlparts = parse_url($episodeurl);
             $baseurl = $urlparts['scheme'] . '://' . $urlparts['host'];
-            if ($urlparts['port']) {
+            if (isset($urlparts['port'])) {
                 $baseurl .= $urlparts['port'];
             }
 
