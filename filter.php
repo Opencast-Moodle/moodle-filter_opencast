@@ -47,7 +47,7 @@ class filter_opencast extends moodle_text_filter
      * @throws dml_exception
      */
     public function filter($text, array $options = array()) {
-        global $PAGE;
+        global $CFG, $PAGE;
         $i = 0;
 
         if (stripos($text, '</video>') === false) {
@@ -57,7 +57,7 @@ class filter_opencast extends moodle_text_filter
 
         foreach (\tool_opencast\local\settings_api::get_ocinstances() as $ocinstance) {
             $episodeurl = get_config('filter_opencast', 'episodeurl_' . $ocinstance->id);
-            if(!$episodeurl) {
+            if (!$episodeurl) {
                 continue;
             }
 
@@ -122,6 +122,7 @@ class filter_opencast extends moodle_text_filter
                             $mustachedata->data = json_encode($data);
                             $mustachedata->width = $width;
                             $mustachedata->height = $height;
+                            $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out();
 
                             if (count($data['streams']) === 1) {
                                 $sources = $data['streams'][0]['sources'];

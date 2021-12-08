@@ -27,6 +27,7 @@
       "height": "250",
       "playerid": "ocplayer_0",
       "configurl": "/filter/opencast/config.json",
+      "modplayerpath": "/mod/opencast/player.html",
       "data": "{&quot;metadata&quot;:{&quot;title&quot;: &quot;Test video&quot;, &quot;etc&quot;: &quot;...&quot;}"
   }
 }}
@@ -37,7 +38,7 @@
 {{^resolution}}
 <div class="filter-opencast player-wrapper">
 {{/resolution}}
-    <iframe src="/mod/opencast/player.html" class="filter-player-iframe" id="{{playerid}}" allowfullscreen></iframe>
+    <iframe src="{{modplayerpath}}" class="filter-player-iframe" id="{{playerid}}" allowfullscreen></iframe>
 </div>
 
 <script>
