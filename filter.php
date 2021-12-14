@@ -119,6 +119,10 @@ class filter_opencast extends moodle_text_filter
                             $mustachedata = new stdClass();
                             $mustachedata->playerid = 'ocplayer_' . $i++;
                             $mustachedata->configurl = get_config('filter_opencast', 'configurl_' . $ocinstance->id);
+                            if (strpos($mustachedata->configurl, 'http') === false) {
+                                $mustachedata->configurl = (new moodle_url($mustachedata->configurl))->out();
+                            }
+
                             $mustachedata->data = json_encode($data);
                             $mustachedata->width = $width;
                             $mustachedata->height = $height;
