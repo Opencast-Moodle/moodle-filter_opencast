@@ -23,6 +23,8 @@ The first configuration "URL template for filtering" specifies the URL type that
 
 The second configuration "URL to Paella config.json" specifies the path to the Paella player config. This config can be adapted if you want to modify the look or behavior of the Paella player.
 
+Notice: Make sure to configure [mod_opencast](https://github.com/Opencast-Moodle/moodle-mod_opencast) before using the filter. If [mod_opencast](https://github.com/Opencast-Moodle/moodle-mod_opencast) isn't configured correctly, the paella player won't be able to display the video.
+
 ## License ##
 
 This plugin is developed in cooperation with the WWU Münster.
