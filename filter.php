@@ -56,105 +56,114 @@ class filter_opencast extends moodle_text_filter
         }
 
         foreach (\tool_opencast\local\settings_api::get_ocinstances() as $ocinstance) {
-            $episodeurl = get_config('filter_opencast', 'episodeurl_' . $ocinstance->id);
-            if (!$episodeurl) {
+            $episodeurls = get_config('filter_opencast', 'episodeurl_' . $ocinstance->id);
+
+            if (!$episodeurls) {
                 continue;
             }
 
-            $urlparts = parse_url($episodeurl);
-            $baseurl = $urlparts['scheme'] . '://' . $urlparts['host'];
-            if (isset($urlparts['port'])) {
-                $baseurl .= $urlparts['port'];
-            }
+            foreach (explode("\n", $episodeurls) as $episodeurl) {
+                $episodeurl = trim($episodeurl);
 
-            if (empty($episodeurl) || stripos($text, $baseurl) === false) {
-                continue;
-            }
+                $urlparts = parse_url($episodeurl);
+                $baseurl = $urlparts['scheme'] . '://' . $urlparts['host'];
+                if (isset($urlparts['port'])) {
+                    $baseurl .= $urlparts['port'];
+                }
 
-            // Looking for tags.
-            $matches = preg_split('/(<[^>]*>)/i', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-            if ($matches) {
-                $renderer = $PAGE->get_renderer('filter_opencast');
-                $video = false;
-                $width = false;
-                $height = false;
+                if (empty($episodeurl) || stripos($text, $baseurl) === false) {
+                    continue;
+                }
 
-                foreach ($matches as $match) {
-                    // Check if the match is a video tag.
-                    if (substr($match, 0, 6) === "<video") {
-                        $video = true;
-                        preg_match('/width="([0-9]+)"/', $match, $width);
-                        preg_match('/height="([0-9]+)"/', $match, $height);
-                        $width = $width ? $width[1] : $width;
-                        $height = $height ? $height[1] : $height;
-                    } else if ($video) {
-                        $video = false;
-                        if (substr($match, 0, 7) === "<source") {
+                // Looking for tags.
+                $matches = preg_split('/(<[^>]*>)/i', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+                if ($matches) {
+                    $renderer = $PAGE->get_renderer('filter_opencast');
+                    $video = false;
+                    $width = false;
+                    $height = false;
 
-                            // Check if video is from opencast.
-                            if (strpos($match, $baseurl) === false) {
-                                $width = $height = false;
-                                continue;
-                            }
+                    foreach ($matches as $match) {
+                        // Check if the match is a video tag.
+                        if (substr($match, 0, 6) === "<video") {
+                            $video = true;
+                            preg_match('/width="([0-9]+)"/', $match, $width);
+                            preg_match('/height="([0-9]+)"/', $match, $height);
+                            $width = $width ? $width[1] : $width;
+                            $height = $height ? $height[1] : $height;
+                        } else if ($video) {
+                            $video = false;
+                            if (substr($match, 0, 7) === "<source") {
 
-                            // Extract url.
-                            preg_match_all('/<source[^>]+src=([\'"])(?<src>.+?)\1[^>]*>/i', $match, $result);
+                                // Check if video is from opencast.
+                                if (strpos($match, $baseurl) === false) {
+                                    $width = $height = false;
+                                    continue;
+                                }
 
-                            // Change url for loading the (Paella) Player.
-                            $link = $result['src'][0];
+                                // Extract url.
+                                preg_match_all('/<source[^>]+src=([\'"])(?<src>.+?)\1[^>]*>/i', $match, $result);
 
-                            // Get episode id from link.
-                            $episoderegex = "/" . preg_quote($episodeurl, "/") . "/";
-                            $episoderegex = preg_replace('/\\\\\[EPISODEID\\\]/', '([0-9a-zA-Z\-]+)', $episoderegex);
-                            $nummatches = preg_match_all($episoderegex, $link, $episodeid);
+                                // Change url for loading the (Paella) Player.
+                                $link = $result['src'][0];
 
-                            if (!$nummatches) {
-                                $width = $height = false;
-                                continue;
-                            }
+                                // Get episode id from link.
+                                $episoderegex = "/" . preg_quote($episodeurl, "/") . "/";
+                                $episoderegex = preg_replace('/\\\\\[EPISODEID\\\]/', '([0-9a-zA-Z\-]+)', $episoderegex);
+                                $nummatches = preg_match_all($episoderegex, $link, $episodeid);
 
-                            $data = paella_transform::get_paella_data_json($ocinstance->id, $episodeid[1][0]);
+                                if (!$nummatches) {
+                                    $width = $height = false;
+                                    continue;
+                                }
 
-                            // Collect the needed data being submitted to the template.
-                            $mustachedata = new stdClass();
-                            $mustachedata->playerid = 'ocplayer_' . $i++;
-                            $mustachedata->configurl = get_config('filter_opencast', 'configurl_' . $ocinstance->id);
-                            if (strpos($mustachedata->configurl, 'http') === false) {
-                                $mustachedata->configurl = (new moodle_url($mustachedata->configurl))->out();
-                            }
+                                $data = paella_transform::get_paella_data_json($ocinstance->id, $episodeid[1][0]);
 
-                            $mustachedata->data = json_encode($data);
-                            $mustachedata->width = $width;
-                            $mustachedata->height = $height;
-                            $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out();
+                                if (!$data) {
+                                    continue;
+                                }
 
-                            if (count($data['streams']) === 1) {
-                                $sources = $data['streams'][0]['sources'];
-                                $res = $sources[array_key_first($sources)][0]['res'];
-                                $resolution = $res['w'] . '/' . $res['h'];
-                                $mustachedata->resolution = $resolution;
+                                // Collect the needed data being submitted to the template.
+                                $mustachedata = new stdClass();
+                                $mustachedata->playerid = 'ocplayer_' . $i++;
+                                $mustachedata->configurl = get_config('filter_opencast', 'configurl_' . $ocinstance->id);
+                                if (strpos($mustachedata->configurl, 'http') === false) {
+                                    $mustachedata->configurl = (new moodle_url($mustachedata->configurl))->out();
+                                }
 
-                                if ($width xor $height) {
-                                    if ($width) {
-                                        $mustachedata->height = $width * ($res['h'] / $res['w']);
-                                    } else if ($height) {
-                                        $mustachedata->width = $height * ($res['w'] / $res['h']);
+                                $mustachedata->data = json_encode($data);
+                                $mustachedata->width = $width;
+                                $mustachedata->height = $height;
+                                $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out();
+
+                                if (count($data['streams']) === 1) {
+                                    $sources = $data['streams'][0]['sources'];
+                                    $res = $sources[array_key_first($sources)][0]['res'];
+                                    $resolution = $res['w'] . '/' . $res['h'];
+                                    $mustachedata->resolution = $resolution;
+
+                                    if ($width xor $height) {
+                                        if ($width) {
+                                            $mustachedata->height = $width * ($res['h'] / $res['w']);
+                                        } else if ($height) {
+                                            $mustachedata->width = $height * ($res['w'] / $res['h']);
+                                        }
+                                    }
+                                } else {
+                                    if ($width && $height) {
+                                        $mustachedata->width = $width;
+                                        $mustachedata->height = $height;
                                     }
                                 }
-                            } else {
-                                if ($width && $height) {
-                                    $mustachedata->width = $width;
-                                    $mustachedata->height = $height;
-                                }
+
+                                $newtext = $renderer->render_player($mustachedata);
+
+                                // Replace video tag.
+                                $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/',
+                                    $newtext, $text, 1);
                             }
-
-                            $newtext = $renderer->render_player($mustachedata);
-
-                            // Replace video tag.
-                            $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/',
-                                $newtext, $text, 1);
+                            $width = $height = false;
                         }
-                        $width = $height = false;
                     }
                 }
             }

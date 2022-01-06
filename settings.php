@@ -27,9 +27,9 @@ if ($ADMIN->fulltree) {
     $ocinstances = \tool_opencast\local\settings_api::get_ocinstances();
 
     foreach ($ocinstances as $instance) {
-        $settings->add(new admin_setting_configtext('filter_opencast/episodeurl_' . $instance->id,
+        $settings->add(new admin_setting_configtextarea('filter_opencast/episodeurl_' . $instance->id,
             get_string('setting_episodeurl', 'filter_opencast'),
-            get_string('setting_episodeurl_desc', 'filter_opencast'), ''));
+            get_string('setting_episodeurl_desc', 'filter_opencast'), '', PARAM_RAW_TRIMMED, '30', '4'));
 
         $settings->add(new admin_setting_configtext('filter_opencast/configurl_' . $instance->id,
             new lang_string('setting_configurl', 'filter_opencast'),
