@@ -68,7 +68,7 @@ class filter_opencast extends moodle_text_filter
                 $urlparts = parse_url($episodeurl);
                 $baseurl = $urlparts['scheme'] . '://' . $urlparts['host'];
                 if (isset($urlparts['port'])) {
-                    $baseurl .= $urlparts['port'];
+                    $baseurl .= ':' . $urlparts['port'];
                 }
 
                 if (empty($episodeurl) || stripos($text, $baseurl) === false) {
