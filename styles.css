@@ -3,7 +3,6 @@
     margin: auto;
     width: 100%;
     height: 85vh;
-    border: 1px solid #bbb;
 }
 
 @supports (--custom:property) {
@@ -14,14 +13,11 @@
     }
 }
 
-.filter-player-iframe {
-    width: 100%;
-    height: 100%;
-}
-
-.filter-opencast .filter-player-iframe {
+.filter-opencast .mod-opencast-paella-player {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
     border: none;
 }

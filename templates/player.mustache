@@ -33,29 +33,27 @@
 }}
 
 {{#resolution}}
-<div class="{{^width}}filter-opencast{{/width}} player-wrapper" style="--aspect-ratio: {{resolution}}; {{#width}}width: {{width}}px; height: {{height}}px{{/width}}">
+<div class="filter-opencast player-wrapper" style="--aspect-ratio: {{resolution}}; {{#width}}width: {{width}}px; height: {{height}}px{{/width}}">
 {{/resolution}}
 {{^resolution}}
 <div class="filter-opencast player-wrapper">
 {{/resolution}}
-    <iframe src="{{modplayerpath}}" class="filter-player-iframe" id="{{playerid}}" allowfullscreen></iframe>
+    <iframe src="{{modplayerpath}}" class="mod-opencast-paella-player" id="{{playerid}}" allowfullscreen></iframe>
 </div>
 
 <script>
 function init_{{playerid}}() {
-    const iframeWindow = document.getElementById('{{playerid}}').contentWindow;
-    if (!iframeWindow.paella || !iframeWindow.paella.lazyLoad) {
+    let iframeWindow = document.getElementById('{{playerid}}').contentWindow;
+    if (!iframeWindow.MoodlePaellaPlayer || iframeWindow.document.readyState  !== 'complete') {
         setTimeout(init_{{playerid}}, 20, '{{playerid}}', '{{configurl}}');
     }
     else {
-        iframeWindow.paella.lazyLoad('playerContainer', {
-            configUrl: '{{configurl}}',
-            data: JSON.parse('{{data}}'.replaceAll('&quot;', '"'))
-        });
+        iframeWindow.MoodlePaellaPlayer.initPaella(
+            '{{configurl}}',
+            JSON.parse('{{data}}'.replaceAll('&quot;', '"'))
+        );
     }
 }
 
 init_{{playerid}}();
-
 </script>
-
