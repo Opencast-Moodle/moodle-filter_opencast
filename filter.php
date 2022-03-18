@@ -27,8 +27,6 @@
 
 use mod_opencast\local\paella_transform;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Automatic opencast videos filter class.
  *
@@ -36,8 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Tamara Gunkel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filter_opencast extends moodle_text_filter
-{
+class filter_opencast extends moodle_text_filter {
 
     /**
      * Replaces Opencast videos embedded in <video> tags by the paella player.

@@ -24,8 +24,6 @@
 
 namespace filter_opencast\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy Subsystem for filter_opencast implementing null_provider.
  *
