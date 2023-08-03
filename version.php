@@ -25,11 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'filter_opencast';
-$plugin->release   = 'development-version';
-$plugin->version = 2023030100;
+$plugin->release   = 'v4.2-r1';
+$plugin->version = 2023080100;
 $plugin->requires = 2020061500; // Requires Moodle 3.9+.
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = array(
-    'tool_opencast' => 2023030100,
-    'mod_opencast' => 2023030100
+    'tool_opencast' => 2023080100,
+    'mod_opencast' => 2023080100
 );
