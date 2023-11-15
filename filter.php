@@ -123,7 +123,8 @@ class filter_opencast extends moodle_text_filter {
                                 // Collect the needed data being submitted to the template.
                                 $mustachedata = new stdClass();
                                 $mustachedata->playerid = 'ocplayer_' . $i++;
-                                $mustachedata->configurl = get_config('filter_opencast', 'configurl_' . $ocinstance->id);
+                                $mustachedata->configurl = (new moodle_url(get_config('filter_opencast', 'configurl_' . $ocinstance->id)))->out(false);
+                                $mustachedata->themeurl = (new moodle_url(get_config('mod_opencast', 'themeurl_' . $ocinstance->id)))->out(false);
                                 if (strpos($mustachedata->configurl, 'http') === false) {
                                     $mustachedata->configurl = (new moodle_url($mustachedata->configurl))->out();
                                 }

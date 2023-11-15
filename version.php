@@ -31,5 +31,5 @@ $plugin->requires = 2020061500; // Requires Moodle 3.9+.
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->dependencies = array(
     'tool_opencast' => 2023030100,
-    'mod_opencast' => 2023030100
+    'mod_opencast' => 2023052300
 );

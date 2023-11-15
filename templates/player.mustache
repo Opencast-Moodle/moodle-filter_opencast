@@ -49,8 +49,9 @@ function init_{{playerid}}() {
     }
     else {
         iframeWindow.MoodlePaellaPlayer.initPaella(
-            '{{configurl}}',
-            JSON.parse('{{data}}'.replaceAll('&quot;', '"'))
+            '{{{configurl}}}',
+            '{{{themeurl}}}',
+            JSON.parse('{{{data}}}')
         );
     }
 }
