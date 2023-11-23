@@ -29,7 +29,7 @@ $plugin->release   = 'development-version';
 $plugin->version = 2023030100;
 $plugin->requires = 2020061500; // Requires Moodle 3.9+.
 $plugin->maturity = MATURITY_ALPHA;
-$plugin->dependencies = array(
+$plugin->dependencies = [
     'tool_opencast' => 2023030100,
-    'mod_opencast' => 2023052300
-);
+    'mod_opencast' => 2023052300,
+];
