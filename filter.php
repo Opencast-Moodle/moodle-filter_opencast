@@ -43,7 +43,7 @@ class filter_opencast extends moodle_text_filter {
      * @return array|mixed|string|string[]|null
      * @throws dml_exception
      */
-    public function filter($text, array $options = array()) {
+    public function filter($text, array $options = []) {
         global $CFG, $PAGE;
         $i = 0;
 
