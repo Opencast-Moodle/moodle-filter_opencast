@@ -134,7 +134,7 @@ class filter_opencast extends moodle_text_filter {
                                 $mustachedata->height = $height;
                                 $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out();
 
-                                if (count($data['streams']) === 1) {
+                                if (isset($data['streams']) && count($data['streams']) === 1) {
                                     $sources = $data['streams'][0]['sources'];
                                     $res = $sources[array_key_first($sources)][0]['res'];
                                     $resolution = $res['w'] . '/' . $res['h'];
