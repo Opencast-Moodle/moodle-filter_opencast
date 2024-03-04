@@ -44,7 +44,7 @@ class filter_opencast extends moodle_text_filter {
      * @throws dml_exception
      */
     public function filter($text, array $options = []) {
-        global $CFG, $PAGE;
+        global $PAGE, $OUTPUT;
         $i = 0;
 
         if (stripos($text, '</video>') === false) {
@@ -134,27 +134,33 @@ class filter_opencast extends moodle_text_filter {
                                 $mustachedata->height = $height;
                                 $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out();
 
-                                if (isset($data['streams']) && count($data['streams']) === 1) {
-                                    $sources = $data['streams'][0]['sources'];
-                                    $res = $sources[array_key_first($sources)][0]['res'];
-                                    $resolution = $res['w'] . '/' . $res['h'];
-                                    $mustachedata->resolution = $resolution;
+                                if (isset($data['streams'])) {
+                                    if (count($data['streams']) === 1) {
+                                        $sources = $data['streams'][0]['sources'];
+                                        $res = $sources[array_key_first($sources)][0]['res'];
+                                        $resolution = $res['w'] . '/' . $res['h'];
+                                        $mustachedata->resolution = $resolution;
 
-                                    if ($width xor $height) {
-                                        if ($width) {
-                                            $mustachedata->height = $width * ($res['h'] / $res['w']);
-                                        } else if ($height) {
-                                            $mustachedata->width = $height * ($res['w'] / $res['h']);
+                                        if ($width xor $height) {
+                                            if ($width) {
+                                                $mustachedata->height = $width * ($res['h'] / $res['w']);
+                                            } else if ($height) {
+                                                $mustachedata->width = $height * ($res['w'] / $res['h']);
+                                            }
+                                        }
+                                    } else {
+                                        if ($width && $height) {
+                                            $mustachedata->width = $width;
+                                            $mustachedata->height = $height;
                                         }
                                     }
+                                    $newtext = $renderer->render_player($mustachedata);
                                 } else {
-                                    if ($width && $height) {
-                                        $mustachedata->width = $width;
-                                        $mustachedata->height = $height;
-                                    }
+                                    $newtext = $OUTPUT->render(new \core\output\notification(
+                                            get_string('erroremptystreamsources', 'mod_opencast'),
+                                            \core\output\notification::NOTIFY_ERROR
+                                    ));
                                 }
-
-                                $newtext = $renderer->render_player($mustachedata);
 
                                 // Replace video tag.
                                 $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/',
