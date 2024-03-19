@@ -137,7 +137,7 @@ class filter_opencast extends moodle_text_filter {
                 if (self::str_starts_with($match, "</$currenttag")) {
                     $replacement = null;
                     if ($episode) {
-                        $replacement = self::render_player($episode[0], $episode[1], $i++, $width, $height);
+                        $replacement = $this->render_player($episode[0], $episode[1], $i++, $width, $height);
                     }
                     if ($replacement) {
                         $newtext .= $replacement;
@@ -149,14 +149,14 @@ class filter_opencast extends moodle_text_filter {
                     $height = null;
                     $texttoreplace = null;
                     $currenttag = null;
-                } else if (!$episode && $currenttag === 'video' && self::str_starts_with($match, '<source ')) {
+                } else if (!$episode && $currenttag === 'video' && preg_match('/^<source\s/', $match)) {
                     $src = self::get_attribute($match, 'src');
                     if ($src) {
                         $episode = self::test_url($src, $occurrences);
                     }
                 }
             } else {
-                if (self::str_starts_with($match, '<video ')) {
+                if (preg_match('/^<video[>\s]/', $match)) {
                     $currenttag = 'video';
                     $width = self::get_attribute($match, 'width', '[0-9]+');
                     $height = self::get_attribute($match, 'height', '[0-9]+');
@@ -164,7 +164,7 @@ class filter_opencast extends moodle_text_filter {
                     if ($src) {
                         $episode = self::test_url($src, $occurrences);
                     }
-                } else if (self::str_starts_with($match, '<a ')) {
+                } else if (preg_match('/^<a\s/', $match)) {
                     $src = self::get_attribute($match, 'href');
                     if ($src) {
                         $episode = self::test_url($src, $occurrences);
@@ -195,7 +195,7 @@ class filter_opencast extends moodle_text_filter {
      * @param int|null $height Optionally height for player.
      * @return string|null
      */
-    private static function render_player(int $ocinstanceid, string $episodeid, int $playerid,
+    protected function render_player(int $ocinstanceid, string $episodeid, int $playerid,
             $width = null, $height = null): string|null {
         global $OUTPUT, $PAGE;
 
