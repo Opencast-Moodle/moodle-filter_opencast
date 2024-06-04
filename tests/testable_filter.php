@@ -45,10 +45,10 @@ class testable_filter extends \filter_opencast {
      * @param int $playerid Unique id to assign to player element.
      * @param int|null $width Optionally width for player.
      * @param int|null $height Optionally height for player.
-     * @return string|null
+     * @return string
      */
     protected function render_player(int $ocinstanceid, string $episodeid, int $playerid, $width = null,
-            $height = null): string|null {
+            $height = null): string {
         return '<oc-video episode="'. $episodeid . '"/>';
     }
 
