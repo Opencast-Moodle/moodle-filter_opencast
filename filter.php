@@ -42,7 +42,7 @@ class filter_opencast extends moodle_text_filter {
      * @param string $attributecontentregex Regex of what the content of the attribute might be.
      * @return string|null The content of the attribute or null, if it doesn't exist.
      */
-    private static function get_attribute(string $tag, string $attributename, string $attributecontentregex = '.*'): string|null {
+    private static function get_attribute(string $tag, string $attributename, string $attributecontentregex = '.*') {
         $pattern = "/$attributename=(['\"])($attributecontentregex)\\1/";
         preg_match($pattern, $tag, $matches);
         return $matches[2] ?? null;
@@ -54,7 +54,7 @@ class filter_opencast extends moodle_text_filter {
      * @param array $episodeurls array of [ocinstanceid, episoderegex, baseurl].
      * @return array|null [ocinstanceid, episodeid] or null if there are no matches.
      */
-    private static function test_url(string $url, array $episodeurls) : array|null {
+    private static function test_url(string $url, array $episodeurls) {
         foreach ($episodeurls as [$ocinstanceid, $episoderegex, $baseurl]) {
             if (preg_match_all($episoderegex, $url, $matches)) {
                 return [$ocinstanceid, $matches[1][0]];
