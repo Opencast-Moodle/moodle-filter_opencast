@@ -196,7 +196,7 @@ class filter_opencast extends moodle_text_filter {
      * @return string|null
      */
     protected function render_player(int $ocinstanceid, string $episodeid, int $playerid,
-            $width = null, $height = null): string|null {
+            $width = null, $height = null) {
         global $OUTPUT, $PAGE;
 
         $data = paella_transform::get_paella_data_json($ocinstanceid, $episodeid);
