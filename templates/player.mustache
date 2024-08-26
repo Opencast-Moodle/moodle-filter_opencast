@@ -28,7 +28,7 @@
       "playerid": "ocplayer_0",
       "configurl": "/filter/opencast/config.json",
       "modplayerpath": "/mod/opencast/player.html",
-      "data": "{&quot;metadata&quot;:{&quot;title&quot;: &quot;Test video&quot;, &quot;etc&quot;: &quot;...&quot;}"
+      "data": "{\"metadata\":{\"title\": \"Test video\", \"etc\": \"...\"}"
   }
 }}
 
@@ -51,7 +51,7 @@ function init_{{playerid}}() {
         iframeWindow.MoodlePaellaPlayer.initPaella(
             '{{{configurl}}}',
             '{{{themeurl}}}',
-            JSON.parse('{{{data}}}')
+            {{{data}}}
         );
     }
 }
