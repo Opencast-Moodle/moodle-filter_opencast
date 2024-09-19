@@ -118,7 +118,7 @@ class filter_opencast extends moodle_text_filter {
             return $text;
         }
 
-        $i = 0;
+        static $i = 0;
         $newtext = '';
 
         $episode = null;
