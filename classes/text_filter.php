@@ -33,7 +33,7 @@ use mod_opencast\local\paella_transform;
  * @copyright  2024 Justus Dieckmann and Tamara Gunkel, University of Münster
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filter_opencast extends moodle_text_filter {
+class text_filter extends \core_filters\text_filter {
 
     /**
      * Get the content of the attribute $attributename from $tag.
