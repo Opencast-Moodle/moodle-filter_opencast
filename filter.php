@@ -25,4 +25,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+class_alias(\filter_opencast\text_filter::class, \filter_opencast::class);
+
 debugging('This file is no longer required in Moodle 4.5+. Please do not include/require it.', DEBUG_DEVELOPER);
