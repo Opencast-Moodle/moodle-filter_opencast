@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/filter/opencast/tests/testable_filter.php');
 final class replacement_test extends \advanced_testcase {
 
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         set_config('episodeurl_1', "http://localhost:8080/play/[EPISODEID]\nhttps://stable.opencast.de/play/[EPISODEID]",
                 'filter_opencast');
