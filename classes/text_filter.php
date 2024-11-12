@@ -24,6 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace filter_opencast;
+
 use mod_opencast\local\paella_transform;
 
 /**
