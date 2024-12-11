@@ -25,7 +25,6 @@
  */
 
 use filter_opencast\local\lti_helper;
-use html_writer;
 
 require(__DIR__ . '/../../config.php');
 
