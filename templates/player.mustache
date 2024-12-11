@@ -28,6 +28,7 @@
       "playerid": "ocplayer_0",
       "configurl": "/filter/opencast/config.json",
       "modplayerpath": "/mod/opencast/player.html",
+      "ltiplayerpath": "/filter/opencast/ltilaunch.php",
       "data": "{\"metadata\":{\"title\": \"Test video\", \"etc\": \"...\"}"
   }
 }}
@@ -38,9 +39,15 @@
 {{^resolution}}
 <div class="filter-opencast player-wrapper">
 {{/resolution}}
+{{#modplayerpath}}
     <iframe src="{{modplayerpath}}" class="mod-opencast-paella-player" id="{{playerid}}" allowfullscreen></iframe>
+{{/modplayerpath}}
+{{#ltiplayerpath}}
+    <iframe src="{{ltiplayerpath}}" class="filter-lti-player" id="{{playerid}}" allowfullscreen></iframe>
+{{/ltiplayerpath}}
 </div>
 
+{{#modplayerpath}}
 <script>
 function init_{{playerid}}() {
     let iframeWindow = document.getElementById('{{playerid}}').contentWindow;
@@ -58,3 +65,4 @@ function init_{{playerid}}() {
 
 init_{{playerid}}();
 </script>
+{{/modplayerpath}}
