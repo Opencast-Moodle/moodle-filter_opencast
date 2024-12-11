@@ -59,7 +59,7 @@ if (confirm_sesskey()) {
         'method' => 'post',
         'id' => $formid,
         'name' => $formid,
-        'encType' => 'application/x-www-form-urlencoded'
+        'encType' => 'application/x-www-form-urlencoded',
     ];
     echo html_writer::start_tag('form', $formattributed);
 

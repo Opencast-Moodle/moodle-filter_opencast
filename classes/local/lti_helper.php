@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * LTI helper for filter opencast.
+ * LTI helper class for filter opencast.
  * @package    filter_opencast
  * @copyright  2024 Farbod Zamani Boroujeni, ELAN e.V.
  * @author     Farbod Zamani Boroujeni <zamani@elan-ev.de>
@@ -28,13 +28,12 @@ use oauth_helper;
 use tool_opencast\local\settings_api;
 
 /**
- * LTI helper for filter opencast.
+ * LTI helper class for filter opencast.
  * @package    filter_opencast
  * @copyright  2024 Farbod Zamani Boroujeni, ELAN e.V.
  * @author     Farbod Zamani Boroujeni <zamani@elan-ev.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class lti_helper {
 
     /**  */
