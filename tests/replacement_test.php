@@ -43,6 +43,7 @@ final class replacement_test extends \advanced_testcase {
         $this->resetAfterTest();
         set_config('episodeurl_1', "http://localhost:8080/play/[EPISODEID]\nhttps://stable.opencast.de/play/[EPISODEID]",
                 'filter_opencast');
+        set_config('uselti_1', 0, 'filter_opencast');
     }
 
     /**

@@ -26,7 +26,12 @@
 
 namespace filter_opencast;
 
+use filter_opencast\local\lti_helper;
 use mod_opencast\local\paella_transform;
+use tool_opencast\local\settings_api;
+use stdClass;
+use moodle_url;
+
 
 /**
  * Automatic opencast videos filter class.
@@ -57,9 +62,9 @@ class text_filter extends \core_filters\text_filter {
      * @return array|null [ocinstanceid, episodeid] or null if there are no matches.
      */
     private static function test_url(string $url, array $episodeurls) {
-        foreach ($episodeurls as [$ocinstanceid, $episoderegex, $baseurl]) {
+        foreach ($episodeurls as [$ocinstanceid, $episoderegex, $baseurl, $shoulduselti]) {
             if (preg_match_all($episoderegex, $url, $matches)) {
-                return [$ocinstanceid, $matches[1][0]];
+                return [$ocinstanceid, $matches[1][0], $shoulduselti];
             }
         }
         return null;
@@ -81,7 +86,7 @@ class text_filter extends \core_filters\text_filter {
 
         // First section: (Relatively) quick check if there are episode urls in the text, and only look for these later.
         // Improvable by combining all episode urls into one big regex if needed.
-        $ocinstances = \tool_opencast\local\settings_api::get_ocinstances();
+        $ocinstances = settings_api::get_ocinstances();
         $occurrences = [];
         foreach ($ocinstances as $ocinstance) {
             $episodeurls = get_config('filter_opencast', 'episodeurl_' . $ocinstance->id);
@@ -89,6 +94,11 @@ class text_filter extends \core_filters\text_filter {
             if (!$episodeurls) {
                 continue;
             }
+
+            $uselticonfig = get_config('filter_opencast', 'uselti_' . $ocinstance->id);
+            // Double check.
+            $hasconfiguredlti = lti_helper::is_lti_credentials_configured($ocinstance->id);
+            $shoulduselti = $uselticonfig && $hasconfiguredlti;
 
             foreach (explode("\n", $episodeurls) as $episodeurl) {
                 $episodeurl = trim($episodeurl);
@@ -105,7 +115,7 @@ class text_filter extends \core_filters\text_filter {
                 if (self::str_contains($text, $baseurl)) {
                     $episoderegex = "/" . preg_quote($episodeurl, "/") . "/";
                     $episoderegex = preg_replace('/\\\\\[EPISODEID\\\]/', '([0-9a-zA-Z\-]+)', $episoderegex);
-                    $occurrences[] = [$ocinstance->id, $episoderegex, $baseurl];
+                    $occurrences[] = [$ocinstance->id, $episoderegex, $baseurl, $shoulduselti];
                 }
             }
         }
@@ -139,7 +149,7 @@ class text_filter extends \core_filters\text_filter {
                 if (self::str_starts_with($match, "</$currenttag")) {
                     $replacement = null;
                     if ($episode) {
-                        $replacement = $this->render_player($episode[0], $episode[1], $i++, $width, $height);
+                        $replacement = $this->render_player($episode[0], $episode[1], $episode[2], $i++, $width, $height);
                     }
                     if ($replacement) {
                         $newtext .= $replacement;
@@ -192,14 +202,15 @@ class text_filter extends \core_filters\text_filter {
      * Render HTML for embedding video player.
      * @param int $ocinstanceid Id of ocinstance.
      * @param string $episodeid Id opencast episode.
+     * @param bool $shoulduselti Flag to determine whether to use LTI launch for this video or not.
      * @param int $playerid Unique id to assign to player element.
      * @param int|null $width Optionally width for player.
      * @param int|null $height Optionally height for player.
      * @return string|null
      */
-    protected function render_player(int $ocinstanceid, string $episodeid, int $playerid,
-            $width = null, $height = null) {
-        global $OUTPUT, $PAGE;
+    protected function render_player(int $ocinstanceid, string $episodeid, bool $shoulduselti,
+            int $playerid, $width = null, $height = null) {
+        global $OUTPUT, $PAGE, $COURSE;
 
         $data = paella_transform::get_paella_data_json($ocinstanceid, $episodeid);
 
@@ -218,7 +229,11 @@ class text_filter extends \core_filters\text_filter {
         $mustachedata->data = json_encode($data);
         $mustachedata->width = $width;
         $mustachedata->height = $height;
-        $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out(false);
+        if ($shoulduselti) {
+            $mustachedata->ltiplayerpath = lti_helper::get_filter_lti_launch_url($ocinstanceid, $COURSE->id, $episodeid);
+        } else {
+            $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out(false);
+        }
 
         if (isset($data['streams'])) {
             if (count($data['streams']) === 1) {

@@ -42,12 +42,13 @@ class testable_filter extends \filter_opencast {
      * Render a simple
      * @param int $ocinstanceid Id of ocinstance.
      * @param string $episodeid Id opencast episode.
+     * @param bool $shoulduselti Flag to determine whether to use LTI launch for this video or not.
      * @param int $playerid Unique id to assign to player element.
      * @param int|null $width Optionally width for player.
      * @param int|null $height Optionally height for player.
      * @return string
      */
-    protected function render_player(int $ocinstanceid, string $episodeid, int $playerid, $width = null,
+    protected function render_player(int $ocinstanceid, string $episodeid, bool $shoulduselti, int $playerid, $width = null,
             $height = null): string {
         return '<oc-video episode="'. $episodeid . '"/>';
     }

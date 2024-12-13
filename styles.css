@@ -13,7 +13,8 @@
     }
 }
 
-.filter-opencast .mod-opencast-paella-player {
+.filter-opencast .mod-opencast-paella-player,
+.filter-opencast .filter-lti-player {
     position: absolute;
     top: 0;
     left: 0;
