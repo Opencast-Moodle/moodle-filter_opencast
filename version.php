@@ -19,16 +19,16 @@
  *
  * @package    filter_opencast
  * @copyright  2024 Thomas Niedermaier <thomas.niedermaier@uni-muenster.de>
- * @copyright  2018 Tamara Gunkel, 2020 Nina Herrmann
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'filter_opencast';
-$plugin->release = 'v4.5-r1';
-$plugin->version = 2024111100;
+$plugin->release = 'v4.5-r3';
+$plugin->version = 2024111102;
 $plugin->requires = 2024100700; // Requires Moodle 4.5+.
+$plugin->supported = [405, 405];
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'tool_opencast' => 2024111100,
