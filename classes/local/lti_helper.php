@@ -24,8 +24,11 @@
 
 namespace filter_opencast\local;
 
+use core\check\performance\debugging;
 use oauth_helper;
 use tool_opencast\local\settings_api;
+use tool_opencast\local\api;
+use moodle_exception;
 
 /**
  * LTI helper class for filter opencast.
@@ -151,7 +154,8 @@ class lti_helper {
      */
     public static function get_lti_set_object(int $ocinstanceid) {
         $lticredentials = self::get_lti_credentials($ocinstanceid);
-        $baseurl = settings_api::get_apiurl($ocinstanceid);
+        // get url of the engage.ui
+        $baseurl = self::get_engage_url($ocinstanceid);
 
         return (object) [
             'ocinstanceid' => $ocinstanceid,
@@ -187,5 +191,28 @@ class lti_helper {
             return $ltilaunchurl->out(false);
         }
         return $ltilaunchurl;
+    }
+
+    /**
+     *  Calls the URL of the presention node of opencast.
+     *
+     *  This function calls an api endpoint because the url of the engage.ui is different depending on
+     *  the installation (All-In-One or Multiple Servers).
+     *
+     * @param int $ocinstancid
+     * @return string $url the url of the engage.ui of the opencast installation
+     * @throws \moodle_exception
+     */
+    public static function get_engage_url(int $ocinstancid) {
+        $api = api::get_instance($ocinstancid);
+        // Endpoint to call the engage.ui url of presentation node.
+        // Make sure the api user has the rights to call that api endpoint.
+        $engageurlendpoint = '/api/info/organization/properties/engageuiurl';
+        $result = json_decode($api->oc_get($engageurlendpoint), true);
+        $url = $result['org.opencastproject.engage.ui.url'];
+        if (!$url) {
+            throw new \moodle_exception('no_engageurl_error', 'filter_opencast');
+        }
+        return $url;
     }
 }
