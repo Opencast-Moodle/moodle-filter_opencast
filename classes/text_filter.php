@@ -212,7 +212,7 @@ class text_filter extends \core_filters\text_filter {
             int $playerid, $width = null, $height = null) {
         global $OUTPUT, $PAGE, $COURSE;
 
-        $data = paella_transform::get_paella_data_json($ocinstanceid, $episodeid);
+        list($data, $errormessage) = paella_transform::get_paella_data_json($ocinstanceid, $episodeid);
 
         if (!$data) {
             return null;
@@ -253,9 +253,10 @@ class text_filter extends \core_filters\text_filter {
             $renderer = $PAGE->get_renderer('filter_opencast');
             return $renderer->render_player($mustachedata);
         } else {
+            $notificationmessage = !empty($errormessage) ? $errormessage : get_string('erroremptystreamsources', 'mod_opencast');
             return $OUTPUT->render(new \core\output\notification(
-                    get_string('erroremptystreamsources', 'mod_opencast'),
-                    \core\output\notification::NOTIFY_ERROR
+                $notificationmessage,
+                \core\output\notification::NOTIFY_ERROR
             ));
         }
     }
