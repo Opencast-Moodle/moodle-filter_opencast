@@ -209,7 +209,7 @@ class lti_helper {
      */
     public static function get_engage_url(int $ocinstanceid) {
         $api = api::get_instance($ocinstanceid);
-        $response = $api->opencastapi->services->getServiceJSON('org.opencastproject.engage.ui.player.redirect');
+        $response = $api->opencastapi->services->getServiceJSON('org.opencastproject.search');
         $code = $response['code'];
 
         // Make sure everything goes fine.
@@ -225,9 +225,9 @@ class lti_helper {
         if (property_exists($servicesobj, 'services') && property_exists($servicesobj->services, 'service')
             && !empty($servicesobj->services->service)) {
             // Parse the service object to array, which is easier to use!
-            $engageservice = (array) $servicesobj->services->service;
-            if (!empty($engageservice['host'])) {
-                $engageurl = preg_replace(["/\/docs/"], [''], $engageservice['host']);
+            $searchservice = (array) $servicesobj->services->service;
+            if (!empty($searchservice['host']) && $searchservice['active'] && $searchservice['online']) {
+                $engageurl = preg_replace(["/\/docs/"], [''], $searchservice['host']);
             }
         }
 
