@@ -25,6 +25,7 @@
 namespace filter_opencast\local;
 
 use oauth_helper;
+use tool_opencast\exception\opencast_api_response_exception;
 use tool_opencast\local\settings_api;
 use tool_opencast\local\api;
 use moodle_exception;
@@ -149,11 +150,11 @@ class lti_helper {
      *                - ocinstanceid: The ID of the Opencast instance.
      *                - consumerkey: The LTI consumer key for the instance.
      *                - consumersecret: The LTI consumer secret for the instance.
-     *                - baseurl: The API URL for the Opencast instance.
+     *                - baseurl: The API URL for the presentation node of Opencast instance.
      */
     public static function get_lti_set_object(int $ocinstanceid) {
         $lticredentials = self::get_lti_credentials($ocinstanceid);
-        // get url of the engage.ui
+        // Get url of the engage.ui.
         $baseurl = self::get_engage_url($ocinstanceid);
 
         return (object) [
@@ -193,27 +194,75 @@ class lti_helper {
     }
 
     /**
-     *  Calls the URL of the presention node of opencast.
+     * Retrieves the Engage URL for a given Opencast instance.
      *
-     *  This function calls an api endpoint because the url of the engage.ui is different depending on
-     *  the installation (All-In-One or Multiple Servers).
+     * This function attempts to fetch the Engage URL through multiple methods:
+     * 1. Using the 'org.opencastproject.engage.ui.player.redirect' service.
+     * 2. Falling back to the API URL if the first method fails.
+     * 3. Attempting to retrieve the Engage UI URL as a secondary fallback by getting from getOrgEngageUIUrl method.
      *
-     * @param int $ocinstanceid
-     * @return string $url the url of the engage.ui of the opencast installation
-     * @throws \moodle_exception
+     * @param int $ocinstanceid The ID of the Opencast instance.
+     *
+     * @return string The Engage URL for the specified Opencast instance.
+     *
+     * @throws opencast_api_response_exception If there's an error in the API response.
      */
     public static function get_engage_url(int $ocinstanceid) {
         $api = api::get_instance($ocinstanceid);
-        // Endpoint to call the engage.ui url of presentation node.
-        // Make sure the api user has the rights to call that api endpoint.
-        $response = $api->opencastapi->baseApi->getOrgEngageUIUrl();
-        if ($response['code'] != 200) {
-            global $CFG;
-            $supportemail = $CFG->supportemail;
-            throw new \moodle_exception('no_engageurl_error', 'filter_opencast',  '', $supportemail);
-        } else {
-            $engageui = $response['body'];
-            return $engageui->{'org.opencastproject.engage.ui.url'};
+        $response = $api->opencastapi->services->getServiceJSON('org.opencastproject.engage.ui.player.redirect');
+        $code = $response['code'];
+
+        // Make sure everything goes fine.
+        if ($code != 200 && $code != 404) {
+            throw new opencast_api_response_exception($response);
         }
+
+        $engageurl = null;
+
+        // Get the services object from the get call.
+        $servicesobj = $response['body'];
+        // Check if the get call returns any services, if not we return the default oc instance api.
+        if (property_exists($servicesobj, 'services') && property_exists($servicesobj->services, 'service')
+            && !empty($servicesobj->services->service)) {
+            // Parse the service object to array, which is easier to use!
+            $engageservice = (array) $servicesobj->services->service;
+            if (!empty($engageservice['host'])) {
+                $engageurl = preg_replace(["/\/docs/"], [''], $engageservice['host']);
+            }
+        }
+
+        // If we have a valid engage url, we return it.
+        if (!empty($engageurl)) {
+            return $engageurl;
+        }
+
+        // As a default fallback, we assume that the engage node url is the same as the api url.
+        $engageurl = settings_api::get_apiurl($ocinstanceid);
+
+        // Try to get the engage url from engage ui url once more, as secondary fallback method.
+        $response = $api->opencastapi->baseApi->getOrgEngageUIUrl();
+        $code = $response['code'];
+        // If something went wrong, we throw opencast_api_response_exception exception.
+        if ($code != 200) {
+            throw new opencast_api_response_exception($response);
+        }
+
+        // Get the engage ui object from the get call.
+        $engageuiobj = (array) $response['body'];
+
+        // Check if we have a valid engage ui url.
+        if (isset($engageuiobj['org.opencastproject.engage.ui.url'])) {
+            $engageuiurl = $engageuiobj['org.opencastproject.engage.ui.url'];
+
+            // Check if the engage ui url is not empty and not a localhost url.
+            if (!empty($engageuiurl) &&
+                strpos($engageuiurl, 'http://') === false &&
+                strpos($engageuiurl, 'localhost') === false ) {
+                $engageurl = $engageuiurl;
+            }
+        }
+
+        // Finally, we return it.
+        return $engageurl;
     }
 }

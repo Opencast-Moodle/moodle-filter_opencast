@@ -35,4 +35,3 @@ $string['setting_uselti'] = 'Enable LTI authentication';
 $string['setting_uselti_desc'] = 'When enabled, Opencast videos are delivered through LTI authentication using the <strong>default Opencast video player</strong>. This is typically used alongside Secure Static Files in Opencast for enhanced security.';
 $string['setting_uselti_nolti_desc'] = 'To enable LTI Authentication for Opencast, you must configure the required credentials (Consumer Key and Consumer Secret) for this instance. Please do so via this link: {$a}';
 $string['setting_uselti_ocinstance_name'] = 'Opencast API {$a} Instance';
-$string['no_engageurl_error'] = 'Opencast API call for Engage URL not successful. Please contact your support {$a}.';
