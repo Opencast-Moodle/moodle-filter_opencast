@@ -193,48 +193,22 @@ class lti_helper {
         return $ltilaunchurl;
     }
 
+
     /**
-     * Retrieves the Engage URL for a given Opencast instance.
+     * Retrieves the engage URL for a given Opencast instance.
      *
-     * This function attempts to fetch the Engage URL through multiple methods:
-     * 1. Using the 'org.opencastproject.engage.ui.player.redirect' service.
-     * 2. Falling back to the API URL if the first method fails.
-     * 3. Attempting to retrieve the Engage UI URL as a secondary fallback by getting from getOrgEngageUIUrl method.
+     * This function attempts to get the engage URL for the specified Opencast instance.
+     * It first tries to fetch the URL from the Opencast API. If that fails, it falls back
+     * to using the API URL as the engage URL.
      *
      * @param int $ocinstanceid The ID of the Opencast instance.
      *
-     * @return string The Engage URL for the specified Opencast instance.
+     * @return string The engage URL for the Opencast instance.
      *
-     * @throws opencast_api_response_exception If there's an error in the API response.
+     * @throws opencast_api_response_exception If the API request fails.
      */
     public static function get_engage_url(int $ocinstanceid) {
         $api = api::get_instance($ocinstanceid);
-        $response = $api->opencastapi->services->getServiceJSON('org.opencastproject.search');
-        $code = $response['code'];
-
-        // Make sure everything goes fine.
-        if ($code != 200 && $code != 404) {
-            throw new opencast_api_response_exception($response);
-        }
-
-        $engageurl = null;
-
-        // Get the services object from the get call.
-        $servicesobj = $response['body'];
-        // Check if the get call returns any services, if not we return the default oc instance api.
-        if (property_exists($servicesobj, 'services') && property_exists($servicesobj->services, 'service')
-            && !empty($servicesobj->services->service)) {
-            // Parse the service object to array, which is easier to use!
-            $searchservice = (array) $servicesobj->services->service;
-            if (!empty($searchservice['host']) && $searchservice['active'] && $searchservice['online']) {
-                $engageurl = preg_replace(["/\/docs/"], [''], $searchservice['host']);
-            }
-        }
-
-        // If we have a valid engage url, we return it.
-        if (!empty($engageurl)) {
-            return $engageurl;
-        }
 
         // As a default fallback, we assume that the engage node url is the same as the api url.
         $engageurl = settings_api::get_apiurl($ocinstanceid);
