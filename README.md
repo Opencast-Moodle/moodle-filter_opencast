@@ -28,7 +28,7 @@ Admin Settings
 --------------
 
 View the documentation of the plugin settings [here](https://moodle.docs.opencast.org/#filter/settings/).
-
+! Be aware: If this filter plugin is going to deliver videos via LTI-Authentication the API User should get the role ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW !
 
 ## Documentation ##
 
