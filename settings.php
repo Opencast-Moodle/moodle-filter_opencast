@@ -57,7 +57,7 @@ if ($ADMIN->fulltree) {
                 get_string('setting_uselti_ocinstance_name', 'filter_opencast', $ocinstancename), ['target' => '_blank']);
             $description = get_string('setting_uselti_nolti_desc', 'filter_opencast', $link);
             $settings->add(
-                new admin_setting_configempty('block_opencast/uselti_' . $instance->id,
+                new admin_setting_configempty('tool_opencast/uselti_' . $instance->id,
                     get_string('setting_uselti', 'filter_opencast'),
                     $description));
         }
