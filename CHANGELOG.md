@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.5.4 (2025-08-06)
+------------------
+* [CHANGE] Test against Opencast 17
+
+
 4.5.3 (2025-01-16)
 ------------------
 * [FIXED] #57 Read paella json data properly from mod
