@@ -63,7 +63,7 @@ if (confirm_sesskey()) {
     echo html_writer::start_tag('form', $formattributed);
 
     foreach ($ltiparams as $name => $value) {
-        $attributes = ['type' => 'hidden', 'name' => htmlspecialchars($name), 'value' => htmlspecialchars($value)];
+        $attributes = ['type' => 'hidden', 'name' => $name, 'value' => $value];
         echo html_writer::empty_tag('input', $attributes) . "\n";
     }
 
