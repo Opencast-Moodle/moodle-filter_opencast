@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.1 (2024-09-01)
+------------------
+* [CHANGE] #139 Remove htmlspecialchars calls from hidden input fields
+
+
 5.0.0 (2024-08-01)
 ------------------
 * [CHANGE] #62 Migrate Settings from block_opencast to tool_opencast
