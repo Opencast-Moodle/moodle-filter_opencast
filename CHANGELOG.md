@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.5.5 (2025-09-01)
+------------------
+* [CHANGE] #64 Remove htmlspecialchars calls from hidden input fields
+
+
 4.5.4 (2025-08-06)
 ------------------
 * [CHANGE] Test against Opencast 17
