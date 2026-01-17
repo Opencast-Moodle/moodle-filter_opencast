@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0 (2026-01-17)
+------------------
+* Moodle 5.1 compatible version
+
+
 5.0.1 (2024-09-01)
 ------------------
 * [CHANGE] #139 Remove htmlspecialchars calls from hidden input fields
