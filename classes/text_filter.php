@@ -254,7 +254,6 @@ class text_filter extends \core_filters\text_filter {
         }
 
         if ($api?->jwtservice?->is_enabled() ?? false) {
-            $baseurl = $api->jwtservice->extract_base_url_from_paella_streams_data($data['streams'], $ocinstanceid);
             // We go for JWT first.
             $classes = [
                 'wrapper' => ['player-wrapper', 'filter-opencast'],
@@ -264,7 +263,6 @@ class text_filter extends \core_filters\text_filter {
                 $ocinstanceid,
                 $episodeid,
                 $classes,
-                $baseurl,
                 $resolution,
                 $calculatedwidth,
                 $calculatedheight
