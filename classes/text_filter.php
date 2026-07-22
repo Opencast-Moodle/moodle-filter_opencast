@@ -28,6 +28,7 @@ namespace filter_opencast;
 
 use filter_opencast\local\lti_helper;
 use mod_opencast\local\paella_transform;
+use tool_opencast\local\api;
 use tool_opencast\local\settings_api;
 use stdClass;
 use moodle_url;
@@ -212,14 +213,66 @@ class text_filter extends \core_filters\text_filter {
             int $playerid, $width = null, $height = null) {
         global $OUTPUT, $PAGE, $COURSE;
 
+        $api = api::get_instance($ocinstanceid, [], [], false, false);
+
         list($data, $errormessage) = paella_transform::get_paella_data_json($ocinstanceid, $episodeid);
 
         if (!$data) {
             return null;
         }
 
+        if (!isset($data['streams'])) {
+            $notificationmessage = !empty($errormessage) ? $errormessage : get_string('erroremptystreamsources', 'mod_opencast');
+            return $OUTPUT->render(new \core\output\notification(
+                $notificationmessage,
+                \core\output\notification::NOTIFY_ERROR
+            ));
+        }
+
         // Collect the needed data being submitted to the template.
         $mustachedata = new stdClass();
+
+        // Decide the resolution and size here, so that we can also use it for JWT.
+        $resolution = null;
+        $calculatedwidth = null;
+        $calculatedheight = null;
+        if (count($data['streams']) === 1) {
+            $sources = $data['streams'][0]['sources'];
+            $res = $sources[array_key_first($sources)][0]['res'];
+            $resolution = $res['w'] . '/' . $res['h'];
+            $mustachedata->resolution = $resolution;
+
+            if ($width xor $height) {
+                if ($width) {
+                    $calculatedheight = $width * ($res['h'] / $res['w']);
+                    $mustachedata->height = $calculatedheight;
+                } else if ($height) {
+                    $calculatedwidth = $height * ($res['w'] / $res['h']);
+                    $mustachedata->width = $calculatedwidth;
+                }
+            }
+        }
+
+        if ($api?->jwtservice?->is_enabled() ?? false) {
+            // We go for JWT first.
+            $classes = [
+                'wrapper' => ['player-wrapper', 'filter-opencast'],
+                'iframe' => ['mod-opencast-paella-player'],
+            ];
+            $jwtiframehtml = $api->jwtservice->get_jwt_iframe_player_html(
+                $ocinstanceid,
+                $episodeid,
+                $classes,
+                $resolution,
+                $calculatedwidth,
+                $calculatedheight
+            );
+
+            if ($jwtiframehtml) {
+                return $jwtiframehtml;
+            }
+        }
+
         $mustachedata->playerid = 'ocplayer_' . $playerid;
         $mustachedata->configurl =
                 (new moodle_url(get_config('filter_opencast', 'configurl_' . $ocinstanceid)))->out(false);
@@ -235,30 +288,8 @@ class text_filter extends \core_filters\text_filter {
             $mustachedata->modplayerpath = (new moodle_url('/mod/opencast/player.html'))->out(false);
         }
 
-        if (isset($data['streams'])) {
-            if (count($data['streams']) === 1) {
-                $sources = $data['streams'][0]['sources'];
-                $res = $sources[array_key_first($sources)][0]['res'];
-                $resolution = $res['w'] . '/' . $res['h'];
-                $mustachedata->resolution = $resolution;
-
-                if ($width xor $height) {
-                    if ($width) {
-                        $mustachedata->height = $width * ($res['h'] / $res['w']);
-                    } else if ($height) {
-                        $mustachedata->width = $height * ($res['w'] / $res['h']);
-                    }
-                }
-            }
-            $renderer = $PAGE->get_renderer('filter_opencast');
-            return $renderer->render_player($mustachedata);
-        } else {
-            $notificationmessage = !empty($errormessage) ? $errormessage : get_string('erroremptystreamsources', 'mod_opencast');
-            return $OUTPUT->render(new \core\output\notification(
-                $notificationmessage,
-                \core\output\notification::NOTIFY_ERROR
-            ));
-        }
+        $renderer = $PAGE->get_renderer('filter_opencast');
+        return $renderer->render_player($mustachedata);
     }
 
     /**
