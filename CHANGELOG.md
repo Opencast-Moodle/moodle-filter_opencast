@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.5.6 (2026-07-22)
+------------------
+* [FEATURE] #67 Integrate JWT authentication core and tests
+
+
 4.5.5 (2025-09-01)
 ------------------
 * [CHANGE] #64 Remove htmlspecialchars calls from hidden input fields
