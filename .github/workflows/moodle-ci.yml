@@ -11,4 +11,6 @@ jobs:
     uses: Opencast-Moodle/moodle-workflows-opencast/.github/workflows/moodle-ci.yml@main
     with:
       requires-tool-plugin: true
-      branch-tool-plugin: MOODLE_501_STABLE
+      requires-mod-plugin: true
+      branch-tool-plugin: MOODLE_502_STABLE
+      branch-mod-plugin: MOODLE_502_STABLE
