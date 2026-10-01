@@ -34,7 +34,6 @@ require_once($CFG->libdir . '/weblib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter_opencast_renderer extends plugin_renderer_base {
-
     /**
      * Display the player.
      *

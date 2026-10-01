@@ -37,12 +37,14 @@ require_once($CFG->dirroot . '/filter/opencast/tests/testable_filter.php');
  * @group      filter_opencast
  */
 final class replacement_test extends \advanced_testcase {
-
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        set_config('episodeurl_1', "http://localhost:8080/play/[EPISODEID]\nhttps://stable.opencast.de/play/[EPISODEID]",
-                'filter_opencast');
+        set_config(
+            'episodeurl_1',
+            "http://localhost:8080/play/[EPISODEID]\nhttps://stable.opencast.de/play/[EPISODEID]",
+            'filter_opencast'
+        );
         set_config('uselti_1', 0, 'filter_opencast');
     }
 
@@ -104,5 +106,4 @@ href="http://localhost:8080/play/64b085e9-0142-4a10-a08e-3dbce055e740">look, a v
             ],
         ];
     }
-
 }

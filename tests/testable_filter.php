@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/filter/opencast/filter.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testable_filter extends \filter_opencast {
-
     /**
      * Render a simple
      * @param int $ocinstanceid Id of ocinstance.
@@ -48,9 +47,14 @@ class testable_filter extends \filter_opencast {
      * @param int|null $height Optionally height for player.
      * @return string
      */
-    protected function render_player(int $ocinstanceid, string $episodeid, bool $shoulduselti, int $playerid, $width = null,
-            $height = null): string {
-        return '<oc-video episode="'. $episodeid . '"/>';
+    protected function render_player(
+        int $ocinstanceid,
+        string $episodeid,
+        bool $shoulduselti,
+        int $playerid,
+        $width = null,
+        $height = null
+    ): string {
+        return '<oc-video episode="' . $episodeid . '"/>';
     }
-
 }

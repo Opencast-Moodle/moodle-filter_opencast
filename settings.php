@@ -30,21 +30,33 @@ if ($ADMIN->fulltree) {
     $ocinstances = \tool_opencast\local\settings_api::get_ocinstances();
 
     foreach ($ocinstances as $instance) {
-        $settings->add(new admin_setting_configtextarea('filter_opencast/episodeurl_' . $instance->id,
+        $settings->add(new admin_setting_configtextarea(
+            'filter_opencast/episodeurl_' . $instance->id,
             get_string('setting_episodeurl', 'filter_opencast'),
-            get_string('setting_episodeurl_desc', 'filter_opencast'), '', PARAM_RAW_TRIMMED, '30', '4'));
+            get_string('setting_episodeurl_desc', 'filter_opencast'),
+            '',
+            PARAM_RAW_TRIMMED,
+            '30',
+            '4'
+        ));
 
-        $settings->add(new admin_setting_configtext('filter_opencast/configurl_' . $instance->id,
+        $settings->add(new admin_setting_configtext(
+            'filter_opencast/configurl_' . $instance->id,
             new lang_string('setting_configurl', 'filter_opencast'),
-            new lang_string('setting_configurl_desc', 'filter_opencast'), '/filter/opencast/config.json'));
+            new lang_string('setting_configurl_desc', 'filter_opencast'),
+            '/filter/opencast/config.json'
+        ));
 
 
         $hasconfiguredlti = lti_helper::is_lti_credentials_configured($instance->id);
         // Providing use lti option, when when the consumer key and secret are configured in tool_opencast.
         if ($hasconfiguredlti) {
-            $settings->add(new admin_setting_configcheckbox('filter_opencast/uselti_' . $instance->id,
+            $settings->add(new admin_setting_configcheckbox(
+                'filter_opencast/uselti_' . $instance->id,
                 new lang_string('setting_uselti', 'filter_opencast'),
-                new lang_string('setting_uselti_desc', 'filter_opencast'), 0));
+                new lang_string('setting_uselti_desc', 'filter_opencast'),
+                0
+            ));
         } else {
             // Otherwise, we will inform the admin about this setting with extra info to configure this if needed.
             $path = '/admin/settings.php?section=tool_opencast_configuration';
@@ -53,13 +65,19 @@ if ($ADMIN->fulltree) {
             }
             $toolopencasturl = new moodle_url($path);
             $ocinstancename = $instance->name ?? $instance->id;
-            $link = html_writer::link($toolopencasturl,
-                get_string('setting_uselti_ocinstance_name', 'filter_opencast', $ocinstancename), ['target' => '_blank']);
+            $link = html_writer::link(
+                $toolopencasturl,
+                get_string('setting_uselti_ocinstance_name', 'filter_opencast', $ocinstancename),
+                ['target' => '_blank']
+            );
             $description = get_string('setting_uselti_nolti_desc', 'filter_opencast', $link);
             $settings->add(
-                new admin_setting_configempty('tool_opencast/uselti_' . $instance->id,
+                new admin_setting_configempty(
+                    'tool_opencast/uselti_' . $instance->id,
                     get_string('setting_uselti', 'filter_opencast'),
-                    $description));
+                    $description
+                )
+            );
         }
     }
 }

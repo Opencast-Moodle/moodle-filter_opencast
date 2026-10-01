@@ -38,7 +38,6 @@ use moodle_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lti_helper {
-
     /**  */
     const LTI_LAUNCH_PATH = '/filter/opencast/ltilaunch.php';
 
@@ -229,9 +228,11 @@ class lti_helper {
             $engageuiurl = $engageuiobj['org.opencastproject.engage.ui.url'];
 
             // Check if the engage ui url is not empty and not a localhost url.
-            if (!empty($engageuiurl) &&
+            if (
+                !empty($engageuiurl) &&
                 strpos($engageuiurl, 'http://') === false &&
-                strpos($engageuiurl, 'localhost') === false ) {
+                strpos($engageuiurl, 'localhost') === false
+            ) {
                 $engageurl = $engageuiurl;
             }
         }
